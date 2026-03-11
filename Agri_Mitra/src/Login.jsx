@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import loginImage from "./assets/login.png";
 
 export default function Login() {
+
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     role: "",
     email: "",
@@ -10,20 +13,32 @@ export default function Login() {
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     console.log("Login Data:", formData);
+
+    // Redirect to Home page
+    navigate("/home");
   };
 
   return (
     <div className="bg-gray-200 min-h-screen flex items-center justify-center p-6">
+
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex overflow-hidden">
+
         {/* LEFT SIDE (FORM) */}
         <div className="w-full md:w-1/2 p-10 lg:p-14">
-          <h1 className="text-2xl font-bold text-gray-800">AGRI-MITRA</h1>
+
+          <h1 className="text-2xl font-bold text-gray-800">
+            AGRI-MITRA
+          </h1>
 
           <p className="text-xs text-gray-500 mt-1">
             KNOW BEFORE YOU GO: REAL-TIME FERTILIZER STOCK ALERTS.
@@ -38,9 +53,12 @@ export default function Login() {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+
             {/* Role */}
             <div>
-              <label className="text-sm text-gray-600">Role</label>
+              <label className="text-sm text-gray-600">
+                Role
+              </label>
 
               <select
                 name="role"
@@ -57,7 +75,9 @@ export default function Login() {
 
             {/* Email */}
             <div>
-              <label className="text-sm text-gray-600">Email address</label>
+              <label className="text-sm text-gray-600">
+                Email address
+              </label>
 
               <input
                 type="email"
@@ -71,18 +91,18 @@ export default function Login() {
 
             {/* Password */}
             <div>
-              <label className="text-sm text-gray-600">Password</label>
+              <label className="text-sm text-gray-600">
+                Password
+              </label>
 
-              <div className="relative">
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Enter password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full mt-1 p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-600"
-                />
-              </div>
+              <input
+                type="password"
+                name="password"
+                placeholder="Enter password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full mt-1 p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-600"
+              />
 
               <div className="text-right mt-2">
                 <Link
@@ -101,31 +121,42 @@ export default function Login() {
             >
               Login
             </button>
+
           </form>
 
           {/* Divider */}
-          <div className="text-center text-sm text-gray-400 my-6">Or</div>
+          <div className="text-center text-sm text-gray-400 my-6">
+            Or
+          </div>
 
           <p className="text-center text-sm text-gray-500">
+
             Don’t have an account?
+
             <Link
               to="/register"
               className="text-blue-600 font-medium hover:underline ml-1"
             >
               Sign Up
             </Link>
+
           </p>
+
         </div>
 
-        {/* RIGHT SIDE (IMAGE) */}
+        {/* RIGHT SIDE IMAGE */}
         <div className="hidden md:block md:w-1/2 relative">
+
           <img
             src={loginImage}
             className="h-full w-full object-cover"
             alt="Farm Field"
           />
+
         </div>
+
       </div>
+
     </div>
   );
 }
