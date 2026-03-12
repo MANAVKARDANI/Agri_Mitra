@@ -3,17 +3,30 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./Login";
 import Register from "./Register";
 import ForgotPassword from "./ForgotPassword";
+
 import Home from "./User/Home";
+import Shop from "./User/Shop"; 
+import About from "./User/About";
+import MainLayout from "./layout/MainLayout";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
 
+        {/* Auth Pages (No Navbar / Footer) */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/home" element={<Home />} />
+
+        {/* User Pages With Layout */}
+        <Route element={<MainLayout />}>
+          <Route path="/home" element={<Home />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/about" element={<About />} />
+
+
+        </Route>
 
       </Routes>
     </BrowserRouter>

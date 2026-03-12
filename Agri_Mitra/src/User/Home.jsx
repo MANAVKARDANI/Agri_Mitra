@@ -15,53 +15,10 @@ import Calcium from "../assets/Calcium Nitrate.png";
 export default function Home() {
   return (
     <div className="bg-white text-gray-800">
+
+      {/* HERO SECTION */}
       {/* NAVBAR */}
-      <nav className="bg-gray-100 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-2">
-              <span className="text-green-800 font-bold text-xl tracking-tight">
-                AGRI-MITRA
-              </span>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-10 text-sm font-semibold tracking-wide">
-              <Link
-                to="/"
-                className="text-green-800 border-b-2 border-green-800 pb-1"
-              >
-                HOME
-              </Link>
-
-              <Link
-                to="/shop"
-                className="text-gray-500 hover:text-green-800 transition"
-              >
-                SHOP
-              </Link>
-
-              <Link
-                to="/about"
-                className="text-gray-500 hover:text-green-800 transition"
-              >
-                ABOUT
-              </Link>
-
-              <Link
-                to="/contact"
-                className="text-gray-500 hover:text-green-800 transition"
-              >
-                CONTACT
-              </Link>
-            </div>
-
-            <div className="flex items-center gap-6 text-gray-600">
-              <button className="hover:text-green-800 transition">🔍</button>
-              <button className="hover:text-green-800 transition">👤</button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      
 
       {/* HERO SECTION */}
       <section className="relative h-[650px] flex items-center">
@@ -270,52 +227,7 @@ export default function Home() {
         </div>
       </section>
       {/* FOOTER */}
-      <footer className="bg-gray-100 border-t border-gray-200 pt-20 pb-8">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-3 gap-16">
-            <div>
-              <h3 className="text-green-800 font-bold text-xl mb-4">
-                AGRI-MITRA
-              </h3>
-
-              <p className="text-gray-500 text-sm leading-relaxed max-w-sm">
-                Empowering modern agriculture through technology, accessibility,
-                and sustainable practices. Join the future of farming today.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-gray-800 mb-6">Home</h4>
-
-              <ul className="space-y-4 text-sm text-gray-500">
-                <li>About Us</li>
-                <li>Shop</li>
-                <li>Privacy Policy</li>
-                <li>Terms of Service</li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-gray-800 mb-6">Contact</h4>
-
-              <ul className="space-y-4 text-sm text-gray-500">
-                <li>📍 Rajkot, Gujarat 360001</li>
-
-                <li>✉ agrimitra@gmail.com</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-200 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
-            <p>© 2026 AGRI-MITRA. All rights reserved.</p>
-
-            <div className="flex gap-8 mt-4 md:mt-0">
-              <span>Sitemap</span>
-              <span>Cookies</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      
     </div>
   );
 }
