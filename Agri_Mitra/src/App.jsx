@@ -5,8 +5,10 @@ import Register from "./Register";
 import ForgotPassword from "./ForgotPassword";
 
 import Home from "./User/Home";
-import Shop from "./User/Shop"; 
+import Shop from "./User/Shop";
 import About from "./User/About";
+import Contact from "./User/contact";
+
 import MainLayout from "./layout/MainLayout";
 
 function App() {
@@ -21,10 +23,11 @@ function App() {
 
         {/* User Pages With Layout */}
         <Route element={<MainLayout />}>
-          <Route path="/home" element={<Home />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/about" element={<About />} />
 
+          <Route path="/home" element={<Home />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
 
         </Route>
 

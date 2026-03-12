@@ -2,30 +2,30 @@ import { Link } from "react-router-dom";
 
 import Hero from "../assets/Hero.png";
 import Homebg from "../assets/Homebg.png";
+
 import Nitrogen from "../assets/nitrogen.png";
 import Phosphorus from "../assets/Phosphorus.png";
 import Potassium from "../assets/Potassium.png";
-import Retail from "../assets/retail.png";
-import Warehouse from "../assets/Warehouse Hubs.png";
+
 import BioDAP from "../assets/Bio dap.png";
 import Potash from "../assets/potash.png";
-import Urea from "../assets/urea.png";
+import Urea from "../assets/UREA.png";
 import Calcium from "../assets/Calcium Nitrate.png";
+
+import lab from "../assets/lab.png";
+import store from "../assets/store.png";
+import scientist from "../assets/scientist.png";
+import tablet from "../assets/tablet.png";
 
 export default function Home() {
   return (
     <div className="bg-white text-gray-800">
-
-      {/* HERO SECTION */}
-      {/* NAVBAR */}
-      
-
-      {/* HERO SECTION */}
+      {/* HERO */}
       <section className="relative h-[650px] flex items-center">
         <div className="absolute inset-0">
           <img
             src={Hero}
-            alt="Greenhouse"
+            alt="Greenhouse farming"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-white/20"></div>
@@ -48,11 +48,17 @@ export default function Home() {
             </p>
 
             <div className="mt-8 flex gap-4">
-              <button className="bg-green-800 hover:bg-green-900 text-white px-6 py-3 rounded-lg font-semibold transition">
+              <button
+                type="button"
+                className="bg-green-800 hover:bg-green-900 text-white px-6 py-3 rounded-lg font-semibold transition hover:scale-105"
+              >
                 Explore Products
               </button>
 
-              <button className="bg-white border border-gray-300 px-6 py-3 rounded-lg font-semibold text-green-800 hover:bg-gray-50 transition">
+              <button
+                type="button"
+                className="bg-white border border-gray-300 px-6 py-3 rounded-lg font-semibold text-green-800 hover:bg-gray-50 transition hover:scale-105"
+              >
                 Locate Shops
               </button>
             </div>
@@ -60,7 +66,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PRECISION SECTION */}
+      {/* PRECISION */}
       <section className="py-24 bg-white text-center">
         <div className="max-w-3xl mx-auto px-6">
           <h2 className="text-2xl text-green-800 font-medium">
@@ -123,80 +129,105 @@ export default function Home() {
           </div>
         </div>
       </section>
-      
 
       {/* LOCATE SUPPLIERS */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
-            <div className="max-w-sm">
-              <div className="w-10 h-[3px] bg-green-700 mb-6"></div>
+      <section className="py-24 bg-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-gray-50 skew-x-12 translate-x-20"></div>
 
-              <h2 className="text-4xl font-bold leading-tight text-gray-900">
-                Locate <br />
-                <span className="text-green-700">Suppliers</span> <br />
-                Near You.
-              </h2>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col lg:flex-row gap-20 items-center">
+            {/* LEFT IMAGE GRID */}
+            <div className="lg:w-1/2">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-6 mt-12">
+                  <div className="bg-gray-100 rounded-2xl overflow-hidden shadow-lg h-64">
+                    <img
+                      src={lab}
+                      alt="fertilizer laboratory"
+                      className="w-full h-full object-cover hover:scale-105 transition duration-700"
+                    />
+                  </div>
 
-              <p className="mt-6 text-gray-500 text-base leading-relaxed">
-                Our network connects you with over 50 verified stockists. Check
-                real-time availability and secure your supplies before the
-                season peaks.
-              </p>
-
-              <Link
-                to="/shops"
-                className="inline-block mt-8 text-green-700 font-semibold hover:underline"
-              >
-                Start Search
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6">
-              <div className="relative">
-                <img
-                  src={Warehouse}
-                  alt="Warehouse"
-                  className="w-full h-[380px] object-cover shadow-lg"
-                />
-                <div className="bg-white px-4 py-2 text-sm font-semibold shadow-md absolute bottom-6 left-6">
-                  Warehouse Hubs
-                </div>
-              </div>
-
-              <div className="relative">
-                <img
-                  src={Retail}
-                  alt="Retail"
-                  className="w-full h-[240px] object-cover"
-                />
-                <div className="bg-white px-4 py-2 text-sm font-semibold shadow-md absolute bottom-6 left-6">
-                  Retail Partners
-                </div>
-              </div>
-
-              <img
-                src={Hero}
-                alt="Greenhouse"
-                className="w-full h-[240px] object-cover shadow-lg"
-              />
-
-              <div className="border border-gray-200 flex items-center justify-center">
-                <div className="text-center py-12 px-10">
-                  <div className="text-4xl font-bold text-green-700">50+</div>
-                  <div className="text-xs uppercase tracking-widest text-gray-400 mt-2">
-                    VERIFIED LOCATIONS
+                  <div className="bg-gray-100 rounded-2xl overflow-hidden shadow-lg h-48">
+                    <img
+                      src={store}
+                      alt="agriculture store"
+                      className="w-full h-full object-cover hover:scale-105 transition duration-700"
+                    />
                   </div>
                 </div>
+
+                <div className="space-y-6">
+                  <div className="bg-gray-100 rounded-2xl overflow-hidden shadow-lg h-48">
+                    <img
+                      src={scientist}
+                      alt="agriculture scientist"
+                      className="w-full h-full object-cover hover:scale-105 transition duration-700"
+                    />
+                  </div>
+
+                  <div className="bg-gray-100 rounded-2xl overflow-hidden shadow-lg h-64">
+                    <img
+                      src={tablet}
+                      alt="smart farming tablet"
+                      className="w-full h-full object-cover hover:scale-105 transition duration-700"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT TEXT */}
+            <div className="lg:w-1/2">
+              <span className="text-green-600 font-bold tracking-widest uppercase text-xs mb-4 block">
+                The 360 Network
+              </span>
+
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-8 leading-tight">
+                50+ Certified <br /> Smart Hubs
+              </h2>
+
+              <p className="text-gray-500 mb-10 text-lg font-light leading-relaxed">
+                Access our network of verified clean-storage facilities. We
+                ensure every product maintains its chemical integrity from our
+                lab to your soil.
+              </p>
+
+              {/* FEATURES */}
+              <div className="flex flex-col gap-4">
+                <FeatureCard
+                  icon="inventory_2"
+                  title="Live Stock Monitoring"
+                  desc="Updates every 15 minutes"
+                />
+
+                <FeatureCard
+                  icon="verified_user"
+                  title="Quality Assurance"
+                  desc="ISO certified storage conditions"
+                />
+              </div>
+
+              {/* BUTTON */}
+              <div className="mt-10">
+                <Link to="/shop">
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 bg-white shadow-lg hover:shadow-xl transition px-8 py-3 rounded-xl font-semibold text-gray-800 hover:scale-105"
+                  >
+                    Locate Nearest Hub
+                    <span className="material-symbols-outlined text-lg">
+                      near_me
+                    </span>
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </section>
-      
 
-      
-      {/* FEATURED SECTION */}
+      {/* FEATURED */}
       <section className="py-24 bg-[#F5F5F5]">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <p className="text-green-700 text-xs font-semibold tracking-[0.25em] uppercase">
@@ -209,11 +240,8 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-14">
             <FeaturedCard img={BioDAP} name="Bio DAP" desc="Organic Compound" />
-
             <FeaturedCard img={Potash} name="Potash" desc="Potassium Rich" />
-
             <FeaturedCard img={Urea} name="Urea" desc="High Nitrogen" />
-
             <FeaturedCard
               img={Calcium}
               name="Calcium Nitrate"
@@ -221,20 +249,23 @@ export default function Home() {
             />
           </div>
 
-          <button className="mt-16 border border-gray-300 px-8 py-3 rounded-full text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
+          <button
+            type="button"
+            className="mt-16 border border-gray-300 px-8 py-3 rounded-full text-sm font-semibold text-gray-700 hover:bg-gray-100 transition hover:scale-105"
+          >
             VIEW ALL PRODUCTS
           </button>
         </div>
       </section>
-      {/* FOOTER */}
-      
     </div>
   );
 }
 
+/* COMPONENTS */
+
 function ProductCard({ img, title, desc, bg }) {
   return (
-    <div className="relative bg-[#F4F4F1] rounded-[40px] p-10 overflow-hidden group hover:shadow-xl">
+    <div className="relative bg-[#F4F4F1] rounded-[40px] p-10 overflow-hidden group hover:shadow-xl transition">
       <div className="absolute inset-0 opacity-10">
         <img src={bg} alt="" className="w-full h-full object-cover" />
       </div>
@@ -255,25 +286,32 @@ function ProductCard({ img, title, desc, bg }) {
   );
 }
 
-
 function FeaturedCard({ img, name, desc }) {
   return (
-    <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition">
+    <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition hover:-translate-y-1">
       <div className="bg-gray-100 p-6 rounded-lg flex justify-center items-center">
-        <img
-          src={img}
-          alt={name}
-          className="h-20 object-contain"
-        />
+        <img src={img} alt={name} className="h-20 object-contain" />
       </div>
 
-      <h3 className="mt-6 font-semibold text-gray-800">
-        {name}
-      </h3>
+      <h3 className="mt-6 font-semibold text-gray-800">{name}</h3>
 
-      <p className="text-sm text-gray-400 mt-1">
-        {desc}
-      </p>
+      <p className="text-sm text-gray-400 mt-1">{desc}</p>
+    </div>
+  );
+}
+
+function FeatureCard({ icon, title, desc }) {
+  return (
+    <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:shadow-md transition">
+      <div className="w-12 h-12 rounded-full bg-white shadow flex items-center justify-center text-green-600">
+        <span className="material-symbols-outlined">{icon}</span>
+      </div>
+
+      <div>
+        <h4 className="font-bold text-gray-800">{title}</h4>
+
+        <p className="text-sm text-gray-500">{desc}</p>
+      </div>
     </div>
   );
 }

@@ -8,8 +8,12 @@ export default function About() {
     <div className="bg-[#F5F5F3] text-slate-800 overflow-hidden">
       {/* HERO */}
       <section className="relative">
-        <div className="h-[400px] w-full relative group">
-          <img src={hero} className="w-full h-full object-cover" />
+        <div className="h-[400px] w-full relative group overflow-hidden">
+          <img
+            src={hero}
+            alt="Agri Mitra"
+            className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+          />
 
           <div className="absolute inset-0 bg-black/30"></div>
 
@@ -18,11 +22,11 @@ export default function About() {
               spa
             </span>
 
-            <h1 className="text-5xl font-extrabold text-white mb-2 ">
+            <h1 className="text-5xl font-extrabold text-white mb-2">
               About Us
             </h1>
 
-            <p className="text-white/90 text-sm tracking-widest uppercase ">
+            <p className="text-white/90 text-sm tracking-widest uppercase">
               Home &gt; About
             </p>
           </div>
@@ -38,13 +42,13 @@ export default function About() {
       </section>
 
       {/* INTRO */}
-      <section className="py-20 bg-[#F5F5F3]">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto text-center px-6">
-          <h2 className="text-5xl font-black mb-8 hover:text-green-700 transition duration-300 cursor-default">
+          <h2 className="text-5xl font-black mb-8 hover:text-green-700 transition">
             About Us
           </h2>
 
-          <p className="text-slate-600 text-lg leading-relaxed hover:text-slate-800 transition duration-300">
+          <p className="text-slate-600 text-lg leading-relaxed hover:text-slate-800 transition">
             At Agri-Mitra we provide smart fertilizer solutions that help
             farmers grow healthier crops and increase productivity. Our mission
             is to bridge the gap between modern agricultural science and
@@ -53,17 +57,17 @@ export default function About() {
         </div>
       </section>
 
-      {/* VALUES SECTION */}
+      {/* VALUES */}
       <section className="py-20">
         <div className="max-w-6xl mx-auto px-6 space-y-32">
           {/* MISSION */}
-          <div className="flex flex-col md:flex-row items-center gap-16 group">
+          <div className="flex flex-col md:flex-row items-center gap-16">
             <div className="md:w-1/2 relative">
               <span className="material-symbols-outlined absolute -top-10 -left-6 text-4xl text-green-700 opacity-40">
                 emergency
               </span>
 
-              <h3 className="text-3xl font-bold mb-6 hover:text-green-700 transition duration-300">
+              <h3 className="text-3xl font-bold mb-6 hover:text-green-700 transition">
                 Our Mission
               </h3>
 
@@ -71,23 +75,20 @@ export default function About() {
                 <li>
                   At Agri-Mitra, our mission is to provide top-quality
                   fertilizers that meet the diverse needs of gardeners and
-                  farmers. We are committed to supporting sustainable
-                  agriculture and ensuring that your plants receive the best
-                  nutrients for optimal growth and health.
+                  farmers while supporting sustainable agriculture.
                 </li>
 
                 <li>
                   We aim to empower farmers with reliable agricultural solutions
-                  that increase productivity while protecting soil fertility.
-                  Through innovation and responsible practices, we strive to
-                  build a greener and more sustainable future for agriculture.
+                  that increase productivity while protecting soil fertility and
+                  promoting long-term sustainability.
                 </li>
               </ul>
             </div>
 
             <div className="md:w-1/2 relative flex justify-center">
               <div
-                className="w-[390px] aspect-square overflow-hidden shadow-2xl transition duration-500 hover:scale-110 hover:shadow-3xl"
+                className="w-[380px] aspect-square overflow-hidden shadow-2xl transition duration-500 hover:scale-105"
                 style={{
                   clipPath:
                     "polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)",
@@ -95,7 +96,8 @@ export default function About() {
               >
                 <img
                   src={missionImg}
-                  className="w-full h-full object-cover transition duration-700 hover:scale-110"
+                  alt="Mission"
+                  className="w-full h-full object-cover"
                 />
               </div>
 
@@ -109,7 +111,7 @@ export default function About() {
           <div className="flex flex-col md:flex-row items-center gap-16">
             <div className="md:w-1/2 relative flex justify-center">
               <div
-                className="w-[399px] aspect-square overflow-hidden shadow-2xl transition duration-500 hover:scale-110"
+                className="w-[380px] aspect-square overflow-hidden shadow-2xl transition duration-500 hover:scale-105"
                 style={{
                   clipPath:
                     "polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)",
@@ -117,7 +119,8 @@ export default function About() {
               >
                 <img
                   src={productImg}
-                  className="w-full h-full object-cover transition duration-700 hover:scale-110"
+                  alt="Products"
+                  className="w-full h-full object-cover"
                 />
               </div>
 
@@ -126,32 +129,25 @@ export default function About() {
               </span>
             </div>
 
-            <div className="md:w-1/2 text-right relative">
-              <span className="material-symbols-outlined absolute -top-12 -right-4 text-3xl text-green-700 opacity-40">
-                asterisk
-              </span>
-
+            <div className="md:w-1/2 text-right">
               <h3 className="text-3xl font-bold mb-6 hover:text-green-700 transition">
                 Our Products
               </h3>
 
               <ul className="text-slate-500 text-sm leading-relaxed list-disc pl-5 space-y-3 hover:text-slate-700 transition">
                 <li>
-                  We provide a wide range of fertilizers including organic,
-                  liquid, and slow-release nutrients designed to improve soil
-                  fertility and crop yield for farms of every size.
+                  We provide organic, liquid and slow-release fertilizers for
+                  farms of every size.
                 </li>
 
                 <li>
-                  Our products are carefully formulated to supply essential
-                  nutrients that promote healthy plant growth, stronger roots,
-                  and higher agricultural productivity.
+                  Our products supply essential nutrients for healthy growth,
+                  stronger roots and better yields.
                 </li>
 
                 <li>
-                  We focus on eco-friendly and scientifically developed
-                  fertilizer solutions that help farmers maintain soil health
-                  while achieving sustainable crop production.
+                  Eco-friendly fertilizer solutions that protect soil health and
+                  support sustainable agriculture.
                 </li>
               </ul>
             </div>
@@ -159,7 +155,7 @@ export default function About() {
 
           {/* COMMITMENT */}
           <div className="flex flex-col md:flex-row items-center gap-16">
-            <div className="md:w-1/2 relative">
+            <div className="md:w-1/2">
               <h3 className="text-3xl font-bold mb-6 hover:text-green-700 transition">
                 Our Commitment
               </h3>
@@ -170,13 +166,11 @@ export default function About() {
                 Agri-Mitra supports sustainable farming practices for a greener
                 future.
               </p>
-
-              <div className="absolute -bottom-12 left-0 w-24 h-24 border-4 border-green-700/10 rounded-full"></div>
             </div>
 
-            <div className="md:w-1/2 relative flex justify-center">
+            <div className="md:w-1/2 flex justify-center">
               <div
-                className="w-[390px] aspect-square overflow-hidden shadow-2xl transition duration-500 hover:scale-110"
+                className="w-[380px] aspect-square overflow-hidden shadow-2xl transition duration-500 hover:scale-105"
                 style={{
                   clipPath:
                     "polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)",
@@ -184,55 +178,48 @@ export default function About() {
               >
                 <img
                   src={commitImg}
-                  className="w-full h-full object-cover transition duration-700 hover:scale-110"
+                  alt="Commitment"
+                  className="w-full h-full object-cover"
                 />
               </div>
-
-              <span className="material-symbols-outlined absolute top-10 right-0 text-5xl text-green-700 opacity-40 animate-pulse">
-                auto_awesome
-              </span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CONTACT / SUBSCRIBE */}
-      <section className="py-20 bg-F5F5F3 border-t border-gray-100">
+      {/* CONTACT */}
+      <section className="py-20 bg-[#F5F5F3] border-t border-gray-200">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 hover:text-green-700 transition">
               AGRI-MITRA . We're here
             </h2>
 
-            <p className="text-slate-500 text-sm max-w-lg mx-auto hover:text-slate-700 transition">
-              Helping farmers connect with the right fertilizer suppliers for
-              better crop productivity and sustainable agriculture.
+            <p className="text-slate-500 text-sm max-w-lg mx-auto">
+              Helping farmers connect with trusted fertilizer suppliers for
+              better crop productivity.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-20 max-w-4xl mx-auto">
             <div>
-              <h4 className="font-bold text-lg mb-4 uppercase hover:text-green-700 transition">
+              <h4 className="font-bold text-lg mb-4 uppercase">
                 Office Location
               </h4>
 
-              <p className="text-slate-500 text-sm leading-relaxed hover:text-slate-700 transition">
-                Rajkot
-                <br />
-                Gujarat 360001
-                <br />
+              <p className="text-slate-500 text-sm leading-relaxed">
+                Rajkot <br />
+                Gujarat 360001 <br />
                 India
               </p>
             </div>
 
             <div>
-              <h4 className="font-bold text-sm mb-4 uppercase hover:text-green-700 transition">
-                Subscribe
-              </h4>
+              <h4 className="font-bold text-sm mb-4 uppercase">Subscribe</h4>
 
               <div className="flex border-b border-gray-300 pb-2 items-center">
                 <input
-                  className="w-full bg-transparent border-none text-sm focus:ring-0 outline-none"
+                  className="w-full bg-transparent border-none text-sm outline-none"
                   placeholder="Enter your email address"
                 />
 

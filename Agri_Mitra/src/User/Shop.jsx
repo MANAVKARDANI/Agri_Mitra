@@ -62,7 +62,6 @@ export default function Shop() {
       verified: false,
     },
 
-    /* page 2 shops */
     {
       name: "Agri Hub",
       img: FarmaFer,
@@ -122,7 +121,7 @@ export default function Shop() {
 
   return (
     <div className="bg-white text-gray-800">
-      {/* HERO SECTION */}
+      {/* HERO */}
       <section className="relative">
         <div
           className="h-[420px] bg-cover bg-center relative"
@@ -141,15 +140,15 @@ export default function Shop() {
           </div>
         </div>
 
-        {/* FLOATING SEARCH CARD */}
+        {/* SEARCH CARD */}
         <div className="bg-[#F5F5F3] pt-32 pb-24">
           <div className="max-w-6xl mx-auto px-6 -mt-40 relative z-10">
             <div
               className="bg-white rounded-[26px] p-10 border border-gray-100
-            shadow-[0_20px_60px_rgba(0,0,0,0.08)]
-            transition-all duration-500 ease-out
-            hover:shadow-[0_25px_70px_rgba(0,0,0,0.12)]
-            hover:-translate-y-2"
+              shadow-[0_20px_60px_rgba(0,0,0,0.08)]
+              transition-all duration-500
+              hover:shadow-[0_25px_70px_rgba(0,0,0,0.12)]
+              hover:-translate-y-1"
             >
               <h2 className="text-center text-2xl font-bold text-gray-800 mb-10">
                 Find Local Suppliers
@@ -190,8 +189,8 @@ export default function Shop() {
               <div className="flex justify-center">
                 <button
                   className="bg-[#C9A227] hover:bg-yellow-600 text-white font-semibold
-                px-12 py-3 rounded-lg shadow-md flex items-center gap-2
-                transition hover:scale-105"
+                  px-12 py-3 rounded-lg shadow-md flex items-center gap-2
+                  transition hover:scale-105"
                 >
                   <span className="material-icons text-sm">search</span>
                   SEARCH
@@ -209,13 +208,13 @@ export default function Shop() {
             {currentShops.map((shop, index) => (
               <div
                 key={index}
-                className="bg-[#EFEFEF] rounded-2xl p-4 hover:shadow-lg transition group"
+                className="bg-[#EFEFEF] rounded-2xl p-4 hover:shadow-xl transition group"
               >
                 <div className="relative rounded-xl overflow-hidden">
                   <img
                     src={shop.img}
                     alt={shop.name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition duration-500"
+                    className="w-full h-48 object-cover transition duration-500 group-hover:scale-105"
                   />
 
                   {shop.verified && (
@@ -235,22 +234,19 @@ export default function Shop() {
 
                   <p className="text-sm text-gray-500 mt-1">{shop.address}</p>
 
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-1 text-green-700 font-semibold text-sm mt-4"
-                  >
+                  <button className="inline-flex items-center gap-1 text-green-700 font-semibold text-sm mt-4 hover:gap-2 transition">
                     VIEW DETAILS
                     <span className="material-icons text-[16px]">
                       arrow_forward
                     </span>
-                  </a>
+                  </button>
                 </div>
               </div>
             ))}
           </div>
 
           {/* PAGINATION */}
-          <div className="flex justify-center mt-12 gap-3">
+          <div className="flex justify-center mt-12 gap-3 flex-wrap">
             {[...Array(totalPages)].map((_, i) => (
               <button
                 key={i}
