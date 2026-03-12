@@ -7,6 +7,10 @@ import Phosphorus from "../assets/Phosphorus.png";
 import Potassium from "../assets/Potassium.png";
 import Retail from "../assets/retail.png";
 import Warehouse from "../assets/Warehouse Hubs.png";
+import BioDAP from "../assets/Bio dap.png";
+import Potash from "../assets/potash.png";
+import Urea from "../assets/urea.png";
+import Calcium from "../assets/Calcium Nitrate.png";
 
 export default function Home() {
   return (
@@ -162,6 +166,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      
 
       {/* LOCATE SUPPLIERS */}
       <section className="py-24 bg-gray-50">
@@ -179,7 +184,7 @@ export default function Home() {
               <p className="mt-6 text-gray-500 text-base leading-relaxed">
                 Our network connects you with over 50 verified stockists. Check
                 real-time availability and secure your supplies before the
-                season peaks.   
+                season peaks.
               </p>
 
               <Link
@@ -231,7 +236,39 @@ export default function Home() {
           </div>
         </div>
       </section>
+      
 
+      
+      {/* FEATURED SECTION */}
+      <section className="py-24 bg-[#F5F5F5]">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <p className="text-green-700 text-xs font-semibold tracking-[0.25em] uppercase">
+            Curated For You
+          </p>
+
+          <h2 className="text-3xl font-bold text-gray-900 mt-3">
+            Featured Selection
+          </h2>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-14">
+            <FeaturedCard img={BioDAP} name="Bio DAP" desc="Organic Compound" />
+
+            <FeaturedCard img={Potash} name="Potash" desc="Potassium Rich" />
+
+            <FeaturedCard img={Urea} name="Urea" desc="High Nitrogen" />
+
+            <FeaturedCard
+              img={Calcium}
+              name="Calcium Nitrate"
+              desc="Soluble Grade"
+            />
+          </div>
+
+          <button className="mt-16 border border-gray-300 px-8 py-3 rounded-full text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
+            VIEW ALL PRODUCTS
+          </button>
+        </div>
+      </section>
       {/* FOOTER */}
       <footer className="bg-gray-100 border-t border-gray-200 pt-20 pb-8">
         <div className="max-w-7xl mx-auto px-6">
@@ -302,6 +339,29 @@ function ProductCard({ img, title, desc, bg }) {
         <h3 className="text-3xl font-bold text-gray-800 mt-4">{title}</h3>
         <p className="text-gray-500 mt-4 text-lg">{desc}</p>
       </div>
+    </div>
+  );
+}
+
+
+function FeaturedCard({ img, name, desc }) {
+  return (
+    <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition">
+      <div className="bg-gray-100 p-6 rounded-lg flex justify-center items-center">
+        <img
+          src={img}
+          alt={name}
+          className="h-20 object-contain"
+        />
+      </div>
+
+      <h3 className="mt-6 font-semibold text-gray-800">
+        {name}
+      </h3>
+
+      <p className="text-sm text-gray-400 mt-1">
+        {desc}
+      </p>
     </div>
   );
 }
