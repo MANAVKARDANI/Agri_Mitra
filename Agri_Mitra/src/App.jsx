@@ -25,7 +25,7 @@ import AdminLayout from "./Admin/layout/Layout";
 /* Admin Pages */
 import Dashboard from "./Admin/pages/Dashboard";
 // later add these when created
-// import Suppliers from "./Admin/pages/Suppliers";
+import Suppliers from "./Admin/pages/Suppliers";
 // import Inventory from "./Admin/pages/Inventory";
 // import Orders from "./Admin/pages/Orders";
 // import Users from "./Admin/pages/Users";
