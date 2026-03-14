@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import loginImage from "./assets/login.png";
 
 export default function Login() {
-
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -15,7 +14,7 @@ export default function Login() {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -24,21 +23,32 @@ export default function Login() {
 
     console.log("Login Data:", formData);
 
-    // Redirect to Home page
-    navigate("/home");
+    const adminEmail = "admin@gmail.com";
+
+    // Admin Login
+    if (formData.role === "Admin" && formData.email === adminEmail) {
+      navigate("/admin/dashboard");
+    }
+
+    // User Login
+    else if (formData.role === "User") {
+      navigate("/home");
+    }
+
+    // Supplier Login
+    else if (formData.role === "Supplier") {
+      navigate("/home");
+    } else {
+      alert("Invalid Admin Email or Role!");
+    }
   };
 
   return (
     <div className="bg-gray-200 min-h-screen flex items-center justify-center p-6">
-
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex overflow-hidden">
-
-        {/* LEFT SIDE (FORM) */}
+        {/* LEFT SIDE FORM */}
         <div className="w-full md:w-1/2 p-10 lg:p-14">
-
-          <h1 className="text-2xl font-bold text-gray-800">
-            AGRI-MITRA
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-800">AGRI-MITRA</h1>
 
           <p className="text-xs text-gray-500 mt-1">
             KNOW BEFORE YOU GO: REAL-TIME FERTILIZER STOCK ALERTS.
@@ -53,31 +63,27 @@ export default function Login() {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-
             {/* Role */}
             <div>
-              <label className="text-sm text-gray-600">
-                Role
-              </label>
+              <label className="text-sm text-gray-600">Role</label>
 
               <select
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
+                required
                 className="w-full mt-1 p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-600"
               >
-                <option>Select Option</option>
-                <option>Admin</option>
-                <option>Supplier</option>
-                <option>User</option>
+                <option value="">Select Role</option>
+                <option value="Admin">Admin</option>
+                <option value="Supplier">Supplier</option>
+                <option value="User">User</option>
               </select>
             </div>
 
             {/* Email */}
             <div>
-              <label className="text-sm text-gray-600">
-                Email address
-              </label>
+              <label className="text-sm text-gray-600">Email address</label>
 
               <input
                 type="email"
@@ -85,15 +91,14 @@ export default function Login() {
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={handleChange}
+                required
                 className="w-full mt-1 p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-600"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label className="text-sm text-gray-600">
-                Password
-              </label>
+              <label className="text-sm text-gray-600">Password</label>
 
               <input
                 type="password"
@@ -101,6 +106,7 @@ export default function Login() {
                 placeholder="Enter password"
                 value={formData.password}
                 onChange={handleChange}
+                required
                 className="w-full mt-1 p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-600"
               />
 
@@ -121,42 +127,32 @@ export default function Login() {
             >
               Login
             </button>
-
           </form>
 
           {/* Divider */}
-          <div className="text-center text-sm text-gray-400 my-6">
-            Or
-          </div>
+          <div className="text-center text-sm text-gray-400 my-6">Or</div>
 
+          {/* Register Link */}
           <p className="text-center text-sm text-gray-500">
-
             Don’t have an account?
-
             <Link
               to="/register"
               className="text-blue-600 font-medium hover:underline ml-1"
             >
               Sign Up
             </Link>
-
           </p>
-
         </div>
 
         {/* RIGHT SIDE IMAGE */}
         <div className="hidden md:block md:w-1/2 relative">
-
           <img
             src={loginImage}
             className="h-full w-full object-cover"
             alt="Farm Field"
           />
-
         </div>
-
       </div>
-
     </div>
   );
 }

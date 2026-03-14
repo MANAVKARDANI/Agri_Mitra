@@ -1,43 +1,92 @@
-import { Home, Users, Package, ShoppingCart, User } from "lucide-react";
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
+import { Home, Users, Package, ShoppingCart, User, Menu } from "lucide-react";
 
 export default function Sidebar() {
-  return (
-    <div className="w-64 bg-white border-r p-5">
+  const [open, setOpen] = useState(true);
 
-      <div className="flex items-center gap-2 mb-10">
-        <div className="bg-green-100 p-2 rounded-lg">🌿</div>
-        <div>
-          <h1 className="font-bold text-green-700">AGRI-MITRA</h1>
-          <p className="text-xs text-gray-500">AGRI SOLUTIONS</p>
-        </div>
+  const menuItems = [
+    {
+      name: "Home",
+      icon: <Home size={18} />,
+      path: "/admin/dashboard",
+    },
+    {
+      name: "Suppliers",
+      icon: <Users size={18} />,
+      path: "/admin/suppliers",
+    },
+    {
+      name: "Inventory",
+      icon: <Package size={18} />,
+      path: "/admin/inventory",
+    },
+    {
+      name: "Orders",
+      icon: <ShoppingCart size={18} />,
+      path: "/admin/orders",
+    },
+    {
+      name: "User Management",
+      icon: <Users size={18} />,
+      path: "/admin/users",
+    },
+    {
+      name: "Profile",
+      icon: <User size={18} />,
+      path: "/admin/profile",
+    },
+  ];
+
+  return (
+    <div
+      className={`bg-gray-50 border-r min-h-screen transition-all duration-300 ${
+        open ? "w-64" : "w-20"
+      }`}
+    >
+      {/* Toggle Button */}
+      <div className="flex items-center justify-between p-5">
+        {open && (
+          <div className="flex items-center gap-2">
+            <div>
+              <h1 className="font-semibold text-green-700 text-sm">
+                AGRI-MITRA
+              </h1>
+              <p className="text-xs text-gray-500">AGRI SOLUTIONS</p>
+            </div>
+          </div>
+        )}
+
+        <Menu
+          className="cursor-pointer text-gray-500"
+          onClick={() => setOpen(!open)}
+        />
       </div>
 
-      <nav className="space-y-4">
+      {/* Menu */}
+      <nav className="mt-6 space-y-2">
+        {menuItems.map((item, index) => (
+          <NavLink
+            key={index}
+            to={item.path}
+            className={({ isActive }) =>
+              `flex items-center justify-between p-3 mx-3 rounded-lg transition-all ${
+                isActive
+                  ? "bg-green-100 text-green-700"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`
+            }
+          >
+            <div className="flex items-center gap-3">
+              {item.icon}
 
-        <div className="flex items-center gap-3 text-green-700 bg-green-100 p-3 rounded-lg">
-          <Home size={18} /> Home
-        </div>
+              {open && <span className="text-sm font-medium">{item.name}</span>}
+            </div>
 
-        <div className="flex items-center gap-3 text-gray-600 p-3 hover:bg-gray-100 rounded-lg">
-          <Users size={18}/> Suppliers
-        </div>
-
-        <div className="flex items-center gap-3 text-gray-600 p-3 hover:bg-gray-100 rounded-lg">
-          <Package size={18}/> Inventory
-        </div>
-
-        <div className="flex items-center gap-3 text-gray-600 p-3 hover:bg-gray-100 rounded-lg">
-          <ShoppingCart size={18}/> Orders
-        </div>
-
-        <div className="flex items-center gap-3 text-gray-600 p-3 hover:bg-gray-100 rounded-lg">
-          <Users size={18}/> User Management
-        </div>
-
-        <div className="flex items-center gap-3 text-gray-600 p-3 hover:bg-gray-100 rounded-lg">
-          <User size={18}/> Profile
-        </div>
-
+            {/* Active Indicator */}
+            <div className="h-6 w-1 bg-green-700 rounded opacity-0 group-[.active]:opacity-100"></div>
+          </NavLink>
+        ))}
       </nav>
     </div>
   );
