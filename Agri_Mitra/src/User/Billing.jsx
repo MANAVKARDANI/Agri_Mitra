@@ -24,15 +24,13 @@ export default function Billing() {
         <div className="grid lg:grid-cols-3 gap-10">
           {/* BILLING FORM */}
           <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border p-8">
-            <h2 className="text-2xl font-bold mb-8">Billing Details</h2>
+            <h2 className="text-xl font-bold mb-8">Billing Details</h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* NAME + PHONE */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Full Name
-                  </label>
+                  <label className="text-sm text-gray-500">Full Name</label>
 
                   <input
                     required
@@ -43,9 +41,7 @@ export default function Billing() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Phone Number
-                  </label>
+                  <label className="text-sm text-gray-500">Phone Number</label>
 
                   <input
                     required
@@ -58,7 +54,7 @@ export default function Billing() {
 
               {/* ADDRESS */}
               <div>
-                <label className="text-sm font-medium text-gray-600">
+                <label className="text-sm text-gray-500">
                   Shipping Address
                 </label>
 
@@ -72,9 +68,7 @@ export default function Billing() {
 
               {/* PAYMENT METHOD */}
               <div>
-                <label className="text-sm font-medium text-gray-700">
-                  Payment Method
-                </label>
+                <label className="text-sm text-gray-600">Payment Method</label>
 
                 <div className="grid md:grid-cols-3 gap-4 mt-4">
                   <label
@@ -82,8 +76,6 @@ export default function Billing() {
                   >
                     <input
                       type="radio"
-                      name="payment"
-                      value="UPI"
                       checked={payment === "UPI"}
                       onChange={() => setPayment("UPI")}
                     />
@@ -95,8 +87,6 @@ export default function Billing() {
                   >
                     <input
                       type="radio"
-                      name="payment"
-                      value="Card"
                       checked={payment === "Card"}
                       onChange={() => setPayment("Card")}
                     />
@@ -108,8 +98,6 @@ export default function Billing() {
                   >
                     <input
                       type="radio"
-                      name="payment"
-                      value="Cash"
                       checked={payment === "Cash"}
                       onChange={() => setPayment("Cash")}
                     />
@@ -117,48 +105,20 @@ export default function Billing() {
                   </label>
                 </div>
               </div>
-
-              {/* CARD DETAILS */}
-              {payment === "Card" && (
-                <div className="grid md:grid-cols-2 gap-6">
-                  <input
-                    required
-                    placeholder="Card Number"
-                    className="border rounded-lg px-4 py-3"
-                  />
-
-                  <input
-                    required
-                    placeholder="Expiry Date"
-                    className="border rounded-lg px-4 py-3"
-                  />
-
-                  <input
-                    required
-                    placeholder="CVV"
-                    className="border rounded-lg px-4 py-3"
-                  />
-
-                  <input
-                    required
-                    placeholder="Card Holder Name"
-                    className="border rounded-lg px-4 py-3"
-                  />
-                </div>
-              )}
             </form>
           </div>
 
           {/* ORDER SUMMARY */}
           <div className="bg-white rounded-2xl shadow-sm border p-8 h-fit">
-            <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+            <h2 className="text-lg font-bold mb-6">Order Summary</h2>
 
             <div className="space-y-4 text-sm">
               <div className="flex justify-between">
                 <div>
                   <p className="font-medium">{product.name}</p>
-                  <p className="text-gray-500">Qty: {product.qty}</p>
+                  <p className="text-gray-400">Qty: {product.qty}</p>
                 </div>
+
                 <p>Rs. {product.price}</p>
               </div>
 
@@ -174,7 +134,7 @@ export default function Billing() {
                 <p>Rs. {tax.toFixed(2)}</p>
               </div>
 
-              <div className="flex justify-between font-bold text-lg">
+              <div className="flex justify-between font-semibold text-lg">
                 <p>Total</p>
                 <p className="text-yellow-600">Rs. {total.toFixed(2)}</p>
               </div>
@@ -190,6 +150,47 @@ export default function Billing() {
             <p className="text-xs text-gray-400 text-center mt-4">
               Secure SSL Encrypted Payment
             </p>
+          </div>
+        </div>
+
+        {/* INFO SECTION (same as screenshot bottom section) */}
+
+        <div className="mt-24">
+          <div className="bg-[#EEF0F2] rounded-3xl p-14 text-center">
+            <h2 className="text-3xl font-bold mb-4">
+              AGRI-MITRA . We're here.
+            </h2>
+
+            <p className="text-gray-500 text-sm max-w-xl mx-auto mb-12">
+              Hello, we are AGRI-MITRA. Always beside you when you buy farm
+              products or sell. The best results for your harvest are just in
+              sight.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-10 text-left">
+              <div>
+                <h4 className="font-semibold mb-2">Office Location</h4>
+
+                <p className="text-gray-500 text-sm">
+                  156 University, City Rajkot <br />
+                  360005 Gujarat <br />
+                  India
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Get Updates</h4>
+
+                <div className="flex border-b pb-2">
+                  <input
+                    placeholder="Your email address"
+                    className="bg-transparent outline-none w-full text-sm"
+                  />
+
+                  <button className="text-green-700 font-semibold">→</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
