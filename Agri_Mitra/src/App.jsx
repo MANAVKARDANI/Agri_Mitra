@@ -26,9 +26,9 @@ import AdminLayout from "./Admin/layout/Layout";
 import Dashboard from "./Admin/pages/Dashboard";
 // later add these when created
 import Suppliers from "./Admin/pages/Suppliers";
-// import Inventory from "./Admin/pages/Inventory";
-// import Orders from "./Admin/pages/Orders";
-// import Users from "./Admin/pages/Users";
+import Inventory from "./Admin/pages/Inventory";
+import Orders from "./Admin/pages/Orders";
+import Users from "./Admin/pages/Users";
 
 function App() {
   return (
@@ -55,6 +55,10 @@ function App() {
         {/* Admin Panel */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="suppliers" element={<Suppliers />} />
+          <Route path="inventory" element={<Inventory />} />
+          <Route path="orders" element={<Orders />} />
+          <Route path="users" element={<Users />} />
         </Route>
       </Routes>
     </BrowserRouter>
