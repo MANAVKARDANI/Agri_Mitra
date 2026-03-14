@@ -8,6 +8,7 @@ import Home from "./User/Home";
 import Shop from "./User/Shop";
 import About from "./User/About";
 import Contact from "./User/contact";
+import Profile from "./User/ProfilePage";
 
 import MainLayout from "./layout/MainLayout";
 
@@ -15,7 +16,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* Auth Pages (No Navbar / Footer) */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -23,14 +23,12 @@ function App() {
 
         {/* User Pages With Layout */}
         <Route element={<MainLayout />}>
-
           <Route path="/home" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-
+          <Route path="/profile" element={<Profile />} />
         </Route>
-
       </Routes>
     </BrowserRouter>
   );

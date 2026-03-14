@@ -60,8 +60,18 @@ export default function MainLayout() {
             </div>
 
             <div className="flex items-center gap-6 text-gray-600">
-              <button className="hover:text-green-800 transition">🔍</button>
-              <button className="hover:text-green-800 transition">👤</button>
+              <Link to="/shop">
+                <button className="hover:text-green-800 transition">🔍</button>
+              </Link>
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 text-green-800 font-bold text-sm"
+              >
+                <span className="material-symbols-outlined">
+                  account_circle
+                </span>
+                My Account
+              </Link>
             </div>
           </div>
         </div>
