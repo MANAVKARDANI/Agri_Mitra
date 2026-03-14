@@ -6,9 +6,11 @@ import ForgotPassword from "./ForgotPassword";
 
 import Home from "./User/Home";
 import Shop from "./User/Shop";
+import ShopDetails from "./User/ShopDetails";
 import About from "./User/About";
 import Contact from "./User/contact";
 import Profile from "./User/ProfilePage";
+import EditProfile from "./User/EditProfile";
 
 import MainLayout from "./layout/MainLayout";
 
@@ -25,9 +27,11 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/shop-details" element={<ShopDetails />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
         </Route>
       </Routes>
     </BrowserRouter>

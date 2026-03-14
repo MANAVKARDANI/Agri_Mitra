@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import HeroShop from "../assets/Hero_shop.png";
 
@@ -14,109 +15,70 @@ import Root from "../assets/Root & Shoot Suppliers.png";
 export default function Shop() {
   const shops = [
     {
+      id: "farma-fer",
       name: "Farma Fer",
       img: FarmaFer,
       address: "124 Agri Lane, West Valley District, CA 90210",
       verified: true,
     },
     {
+      id: "valley-fertilizers",
       name: "Valley Fertilizers",
       img: Valley,
       address: "88 Farm Road, East District, TX 75001",
       verified: true,
     },
     {
+      id: "eco-crop",
       name: "EcoCrop Solutions",
       img: EcoCrop,
       address: "45 Sustainable Way, North Zone, FL 33101",
       verified: true,
     },
     {
+      id: "growers-choice",
       name: "Growers Choice",
       img: Growers,
       address: "22 Plantation Drive, South Region, CA 92000",
       verified: false,
     },
     {
+      id: "natures-best",
       name: "Nature's Best Agri",
       img: Nature,
       address: "78 Organic Blvd, Central City, TX 78701",
       verified: false,
     },
     {
+      id: "modern-farmer",
       name: "Modern Farmer Supply",
       img: Modern,
       address: "101 Innovation Road, Tech Park, CA 94000",
       verified: true,
     },
     {
+      id: "plant-power",
       name: "Plant Power Store",
       img: Plant,
       address: "33 Green Avenue, Suburbia, FL 32801",
       verified: false,
     },
     {
+      id: "root-shoot",
       name: "Root & Shoot Suppliers",
       img: Root,
       address: "56 Growth Street, Farmland, TX 76000",
       verified: false,
     },
-
-    {
-      name: "Agri Hub",
-      img: FarmaFer,
-      address: "New Road 12, Gujarat",
-      verified: true,
-    },
-    {
-      name: "Green Harvest",
-      img: Valley,
-      address: "Market Street 22",
-      verified: true,
-    },
-    {
-      name: "Crop Center",
-      img: EcoCrop,
-      address: "Farm Valley 11",
-      verified: false,
-    },
-    {
-      name: "Farm Store",
-      img: Growers,
-      address: "Agri Road 33",
-      verified: false,
-    },
-    {
-      name: "Smart Seeds",
-      img: Nature,
-      address: "Field Area 55",
-      verified: true,
-    },
-    {
-      name: "Fertilizer Depot",
-      img: Modern,
-      address: "Industrial Area 8",
-      verified: false,
-    },
-    {
-      name: "Organic Shop",
-      img: Plant,
-      address: "Nature Street 77",
-      verified: true,
-    },
-    { name: "Agri Market", img: Root, address: "Farm Hub 99", verified: false },
   ];
 
-  /* Pagination */
   const [currentPage, setCurrentPage] = useState(1);
-
   const shopsPerPage = 8;
 
   const indexOfLastShop = currentPage * shopsPerPage;
   const indexOfFirstShop = indexOfLastShop - shopsPerPage;
 
   const currentShops = shops.slice(indexOfFirstShop, indexOfLastShop);
-
   const totalPages = Math.ceil(shops.length / shopsPerPage);
 
   return (
@@ -124,79 +86,16 @@ export default function Shop() {
       {/* HERO */}
       <section className="relative">
         <div
-          className="h-[420px] bg-cover bg-center relative"
+          className="h-[350px] bg-cover bg-center"
           style={{ backgroundImage: `url(${HeroShop})` }}
         >
           <div className="absolute inset-0 bg-black/40"></div>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center">
-            <span className="material-icons text-4xl mb-3">storefront</span>
-
             <h1 className="text-5xl font-extrabold">Explore Shops</h1>
-
             <p className="mt-2 text-lg text-white/90">
               Find premium stockists near you
             </p>
-          </div>
-        </div>
-
-        {/* SEARCH CARD */}
-        <div className="bg-[#F5F5F3] pt-32 pb-24">
-          <div className="max-w-6xl mx-auto px-6 -mt-40 relative z-10">
-            <div
-              className="bg-white rounded-[26px] p-10 border border-gray-100
-              shadow-[0_20px_60px_rgba(0,0,0,0.08)]
-              transition-all duration-500
-              hover:shadow-[0_25px_70px_rgba(0,0,0,0.12)]
-              hover:-translate-y-1"
-            >
-              <h2 className="text-center text-2xl font-bold text-gray-800 mb-10">
-                Find Local Suppliers
-              </h2>
-
-              <div className="grid md:grid-cols-3 gap-8 mb-8">
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase">
-                    State
-                  </label>
-
-                  <select className="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 focus:ring-2 focus:ring-green-700 focus:border-green-700">
-                    <option>Select State</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase">
-                    District
-                  </label>
-
-                  <select className="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 focus:ring-2 focus:ring-green-700 focus:border-green-700">
-                    <option>Select District</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase">
-                    Shop / City
-                  </label>
-
-                  <select className="mt-2 w-full rounded-xl border-gray-200 bg-gray-50 focus:ring-2 focus:ring-green-700 focus:border-green-700">
-                    <option>Select City or Shop</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex justify-center">
-                <button
-                  className="bg-[#C9A227] hover:bg-yellow-600 text-white font-semibold
-                  px-12 py-3 rounded-lg shadow-md flex items-center gap-2
-                  transition hover:scale-105"
-                >
-                  <span className="material-icons text-sm">search</span>
-                  SEARCH
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -205,71 +104,78 @@ export default function Shop() {
       <section className="py-16 bg-[#F5F5F3]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {currentShops.map((shop, index) => (
+            {currentShops.map((shop) => (
               <div
-                key={index}
-                className="bg-[#EFEFEF] rounded-2xl p-4 hover:shadow-xl transition group"
+                key={shop.id}
+                className="relative bg-[#EFEFEF] rounded-2xl p-4
+                transition-all duration-500 ease-[cubic-bezier(.25,.8,.25,1)]
+                hover:-translate-y-3 hover:shadow-[0_20px_60px_rgba(0,0,0,0.25)]
+                hover:shadow-green-200/50
+                group cursor-pointer overflow-hidden"
               >
+                {/* Gradient Hover Glow */}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500
+                bg-gradient-to-br from-green-100/40 via-transparent to-yellow-100/40"
+                ></div>
+
+                {/* IMAGE */}
                 <div className="relative rounded-xl overflow-hidden">
                   <img
                     src={shop.img}
                     alt={shop.name}
-                    className="w-full h-48 object-cover transition duration-500 group-hover:scale-105"
+                    className="w-full h-48 object-cover
+                    transition-transform duration-700
+                    group-hover:scale-110"
                   />
 
                   {shop.verified && (
-                    <div className="absolute top-3 right-3 bg-white text-green-700 text-xs font-semibold px-3 py-1 rounded-full shadow flex items-center gap-1">
-                      <span className="material-icons text-[14px]">
-                        verified
-                      </span>
+                    <div className="absolute top-3 right-3 bg-white text-green-700 text-xs px-3 py-1 rounded-full shadow-md">
                       Verified
                     </div>
                   )}
                 </div>
 
-                <div className="mt-4">
-                  <h3 className="font-bold text-lg text-gray-800">
+                {/* TEXT */}
+                <div className="mt-4 relative z-10">
+                  <h3 className="font-bold text-lg text-gray-800 group-hover:text-green-800 transition">
                     {shop.name}
                   </h3>
 
                   <p className="text-sm text-gray-500 mt-1">{shop.address}</p>
 
-                  <button className="inline-flex items-center gap-1 text-green-700 font-semibold text-sm mt-4 hover:gap-2 transition">
+                  {/* BUTTON */}
+                  <Link
+                    to="/shop-details"
+                    state={{ shop }}
+                    className="inline-flex items-center gap-1 text-green-700 font-semibold text-sm mt-4
+                    transition-all duration-300 group-hover:gap-3"
+                  >
                     VIEW DETAILS
-                    <span className="material-icons text-[16px]">
+                    <span className="material-icons text-[16px] transition-transform duration-300 group-hover:translate-x-1">
                       arrow_forward
                     </span>
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}
           </div>
 
           {/* PAGINATION */}
-          <div className="flex justify-center mt-12 gap-3 flex-wrap">
+          <div className="flex justify-center mt-12 gap-3">
             {[...Array(totalPages)].map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentPage(i + 1)}
-                className={`px-4 py-2 rounded-md text-sm font-semibold transition
-                ${
+                className={`px-4 py-2 rounded-md transition ${
                   currentPage === i + 1
-                    ? "bg-[#C9A227] text-white"
-                    : "bg-white border border-gray-300 hover:bg-gray-100"
+                    ? "bg-green-700 text-white"
+                    : "bg-white border hover:bg-gray-100"
                 }`}
               >
                 {i + 1}
               </button>
             ))}
-
-            <button
-              onClick={() =>
-                setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev))
-              }
-              className="px-4 py-2 text-sm font-semibold border border-gray-300 rounded-md hover:bg-gray-100"
-            >
-              Next
-            </button>
           </div>
         </div>
       </section>

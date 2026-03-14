@@ -1,11 +1,6 @@
-import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
-  const [changePassword] = useState(true);
-
-  const [showCurrent, setShowCurrent] = useState(false);
-  const [showNew, setShowNew] = useState(false);
-
   return (
     <div className="bg-[#f7f7f7] min-h-screen flex items-center justify-center py-16">
       {/* PROFILE CARD */}
@@ -31,8 +26,8 @@ export default function Profile() {
           <p className="text-gray-500 text-sm">hirva203@gmail.com</p>
         </div>
 
-        {/* FORM */}
-        <form className="space-y-6">
+        {/* PROFILE DETAILS */}
+        <div className="space-y-6">
           {/* FULL NAME */}
           <div>
             <label className="text-sm text-gray-600 font-medium">
@@ -41,8 +36,9 @@ export default function Profile() {
 
             <input
               type="text"
-              defaultValue="Hirva Togadiya"
-              className="w-full mt-2 bg-gray-100 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-green-700"
+              value="Hirva Togadiya"
+              disabled
+              className="w-full mt-2 bg-gray-100 rounded-lg px-4 py-3 text-gray-600 cursor-not-allowed"
             />
           </div>
 
@@ -54,76 +50,28 @@ export default function Profile() {
 
             <input
               type="email"
-              defaultValue="hirva203@gmail.com"
-              className="w-full mt-2 bg-gray-100 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-green-700"
+              value="hirva203@gmail.com"
+              disabled
+              className="w-full mt-2 bg-gray-100 rounded-lg px-4 py-3 text-gray-600 cursor-not-allowed"
             />
           </div>
 
-          {/* CHANGE PASSWORD */}
-          <div className="flex items-center gap-3">
+          {/* PASSWORD INFO */}
+          <div className="flex items-center gap-3 mt-2">
             <span className="material-symbols-outlined text-green-700">
               check_circle
             </span>
 
-            <label className="text-sm text-gray-700">Change Password</label>
+            <p className="text-sm text-gray-700">Password protected account</p>
           </div>
 
-          {/* CURRENT PASSWORD */}
-          {changePassword && (
-            <>
-              <div>
-                <label className="text-sm text-gray-600 font-medium">
-                  Current Password
-                </label>
-
-                <div className="relative">
-                  <input
-                    type={showCurrent ? "text" : "password"}
-                    placeholder="Your Current Password"
-                    className="w-full mt-2 bg-gray-100 rounded-lg px-4 py-3 pr-10 outline-none focus:ring-2 focus:ring-green-700"
-                  />
-
-                  <span
-                    onClick={() => setShowCurrent(!showCurrent)}
-                    className="material-symbols-outlined absolute right-3 top-5 text-gray-400 cursor-pointer"
-                  >
-                    {showCurrent ? "visibility" : "visibility_off"}
-                  </span>
-                </div>
-              </div>
-
-              {/* NEW PASSWORD */}
-              <div>
-                <label className="text-sm text-gray-600 font-medium">
-                  New Password
-                </label>
-
-                <div className="relative">
-                  <input
-                    type={showNew ? "text" : "password"}
-                    placeholder="Your New Password"
-                    className="w-full mt-2 bg-gray-100 rounded-lg px-4 py-3 pr-10 outline-none focus:ring-2 focus:ring-green-700"
-                  />
-
-                  <span
-                    onClick={() => setShowNew(!showNew)}
-                    className="material-symbols-outlined absolute right-3 top-5 text-gray-400 cursor-pointer"
-                  >
-                    {showNew ? "visibility" : "visibility_off"}
-                  </span>
-                </div>
-              </div>
-            </>
-          )}
-
           {/* BUTTONS */}
-          <div className="flex justify-between pt-4">
-            <button
-              type="submit"
-              className="bg-green-700 hover:bg-green-800 text-white px-8 py-3 rounded-lg shadow-md font-semibold transition"
-            >
-              Edit
-            </button>
+          <div className="flex justify-between pt-6">
+            <Link to="/edit-profile">
+              <button className="bg-green-700 hover:bg-green-800 text-white px-8 py-3 rounded-lg shadow-md font-semibold transition">
+                Edit Profile
+              </button>
+            </Link>
 
             <button
               type="button"
@@ -132,7 +80,7 @@ export default function Profile() {
               Order History
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

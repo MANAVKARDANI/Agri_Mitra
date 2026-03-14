@@ -8,7 +8,7 @@ export default function About() {
     <div className="bg-[#F5F5F3] text-slate-800 overflow-hidden">
       {/* HERO */}
       <section className="relative">
-        <div className="h-[400px] w-full relative group overflow-hidden">
+        <div className="h-[350px] w-full relative group overflow-hidden">
           <img
             src={hero}
             alt="Agri Mitra"

@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <div className="bg-white text-gray-800">
       {/* HERO */}
-      <section className="relative h-[650px] flex items-center">
+      <section className="relative h-[600px] flex items-center">
         <div className="absolute inset-0">
           <img
             src={Hero}
