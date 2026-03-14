@@ -11,7 +11,8 @@ import About from "./User/About";
 import Contact from "./User/contact";
 import Profile from "./User/ProfilePage";
 import EditProfile from "./User/EditProfile";
-
+import ProductDetails from "./User/ProductDetails";
+import Billing from "./User/Billing";
 import MainLayout from "./layout/MainLayout";
 
 function App() {
@@ -32,6 +33,10 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/edit-profile" element={<EditProfile />} />
+          <Route path="/product-details" element={<ProductDetails />} />
+          <Route path="/billing" element={<Billing />} />
+
+
         </Route>
       </Routes>
     </BrowserRouter>

@@ -123,23 +123,13 @@ export default function ShopDetails() {
               <h3 className="font-bold mb-6 text-lg">{p.name}</h3>
 
               {/* BUTTON */}
-              <button
-                className="
-                bg-[#F2E8CF]
-                px-8 py-3
-                rounded-full
-                text-xs
-                uppercase
-                tracking-widest
-                transition-all
-                duration-300
-                hover:bg-yellow-500
-                hover:text-white
-                hover:scale-105
-              "
+              <Link
+                to="/product-details"
+                state={{ product: p, shop }}
+                className="inline-block bg-[#F2E8CF] px-8 py-3 rounded-full text-xs uppercase tracking-widest transition-all duration-300 hover:bg-yellow-500 hover:text-white hover:scale-105"
               >
                 View Product
-              </button>
+              </Link>
             </div>
           ))}
         </div>
