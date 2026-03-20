@@ -1,18 +1,41 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  Outlet,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 
-export default function MainLayout() {
+export default function Layout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Pages where logout should appear
+  const authPages = ["/profile", "/edit-profile"];
+  const showLogout = authPages.includes(location.pathname);
+
+  const handleLogout = () => {
+    // Clear user data (adjust if you store token differently)
+    localStorage.removeItem("user");
+
+    // Redirect to login page
+    navigate("/login");
+  };
+
   return (
-    <div className="bg-white text-gray-800">
-      {/* NAVBAR */}
+    <div className="bg-white text-gray-800 min-h-screen flex flex-col">
+      {/* ================= NAVBAR ================= */}
       <nav className="bg-gray-100 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-20">
+            {/* LOGO */}
             <div className="flex items-center gap-2">
               <span className="text-green-800 font-bold text-xl tracking-tight">
                 AGRI-MITRA
               </span>
             </div>
 
+            {/* MENU */}
             <div className="hidden md:flex items-center space-x-10 text-sm font-semibold tracking-wide">
               <NavLink
                 to="/home"
@@ -59,10 +82,14 @@ export default function MainLayout() {
               </NavLink>
             </div>
 
+            {/* RIGHT SIDE */}
             <div className="flex items-center gap-6 text-gray-600">
+              {/* SEARCH */}
               <Link to="/shop">
                 <button className="hover:text-green-800 transition">🔍</button>
               </Link>
+
+              {/* PROFILE */}
               <Link
                 to="/profile"
                 className="flex items-center gap-2 text-green-800 font-bold text-sm"
@@ -72,19 +99,34 @@ export default function MainLayout() {
                 </span>
                 My Account
               </Link>
+
+              {/* LOGOUT BUTTON (ONLY FOR PROFILE PAGES) */}
+              {showLogout && (
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition shadow-sm"
+                >
+                  <span className="material-symbols-outlined text-base">
+                    Logout
+                  </span>
+                  Logout
+                </button>
+              )}
             </div>
           </div>
         </div>
       </nav>
 
-      {/* PAGE CONTENT */}
-      <Outlet />
+      {/* ================= PAGE CONTENT ================= */}
+      <main className="flex-grow">
+        <Outlet />
+      </main>
 
-      {/* FOOTER */}
+      {/* ================= FOOTER ================= */}
       <footer className="bg-gray-100 border-t border-gray-200 pt-20 pb-8">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-3 gap-16">
-            {/* Brand */}
+            {/* BRAND */}
             <div>
               <h3 className="text-green-800 font-bold text-xl mb-4">
                 AGRI-MITRA
@@ -96,7 +138,7 @@ export default function MainLayout() {
               </p>
             </div>
 
-            {/* Navigation */}
+            {/* NAVIGATION */}
             <div>
               <h4 className="font-semibold text-gray-800 mb-6">Navigation</h4>
 
@@ -155,7 +197,7 @@ export default function MainLayout() {
               </ul>
             </div>
 
-            {/* Contact */}
+            {/* CONTACT */}
             <div>
               <h4 className="font-semibold text-gray-800 mb-6">Contact</h4>
 
@@ -166,7 +208,7 @@ export default function MainLayout() {
             </div>
           </div>
 
-          {/* Bottom */}
+          {/* BOTTOM */}
           <div className="border-t border-gray-200 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
             <p>© 2026 AGRI-MITRA. All rights reserved.</p>
 

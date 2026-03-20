@@ -13,7 +13,7 @@ import Home from "./User/Home";
 import Shop from "./User/Shop";
 import ShopDetails from "./User/ShopDetails";
 import About from "./User/About";
-import Contact from "./User/contact";
+import Contact from "./User/Contact"; // ✅ FIXED
 import Profile from "./User/ProfilePage";
 import EditProfile from "./User/EditProfile";
 import ProductDetails from "./User/ProductDetails";
@@ -24,22 +24,26 @@ import AdminLayout from "./Admin/layout/Layout";
 
 /* Admin Pages */
 import Dashboard from "./Admin/pages/Dashboard";
-// later add these when created
 import Suppliers from "./Admin/pages/Suppliers";
 import Inventory from "./Admin/pages/Inventory";
 import Orders from "./Admin/pages/Orders";
 import Users from "./Admin/pages/Users";
 
+/* ✅ FIXED IMPORT */
+import AddShop from "./Admin/pages/AddSuppliers";
+// OR rename file to AddShop.jsx and use:
+// import AddShop from "./Admin/pages/AddShop";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Authentication Pages */}
+        {/* ================= AUTH ================= */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* User Pages */}
+        {/* ================= USER ================= */}
         <Route element={<MainLayout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
@@ -52,13 +56,16 @@ function App() {
           <Route path="/billing" element={<Billing />} />
         </Route>
 
-        {/* Admin Panel */}
+        {/* ================= ADMIN ================= */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="inventory" element={<Inventory />} />
           <Route path="orders" element={<Orders />} />
           <Route path="users" element={<Users />} />
+
+          {/* ✅ ADD SHOP PAGE */}
+          <Route path="add-shop" element={<AddShop />} />
         </Route>
       </Routes>
     </BrowserRouter>
