@@ -31,12 +31,18 @@ import Orders from "./Admin/pages/Orders";
 import Users from "./Admin/pages/Users";
 import AddShop from "./Admin/pages/AddSuppliers";
 import AddFertilizer from "./Admin/pages/AddFertilizer";
+import AddUser from "./Admin/pages/AddUser";
 
 function App() {
   const [fertilizers, setFertilizers] = useState([]);
+  const [users, setUsers] = useState([]); // ✅ FIX
 
   const addFertilizer = (item) => {
     setFertilizers((prev) => [...prev, item]);
+  };
+
+  const addUser = (user) => {
+    setUsers((prev) => [...prev, user]);
   };
 
   return (
@@ -63,19 +69,30 @@ function App() {
         {/* ADMIN */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
+
           <Route
             path="inventory"
             element={<Inventory fertilizers={fertilizers} />}
           />
+
+          <Route
+            path="users"
+            element={<Users users={users} />}
+          />
+
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="orders" element={<Orders />} />
-          <Route path="users" element={<Users />} />
 
           <Route path="add-shop" element={<AddShop />} />
 
           <Route
             path="add-fertilizer"
             element={<AddFertilizer addFertilizer={addFertilizer} />}
+          />
+
+          <Route
+            path="add-user"
+            element={<AddUser addUser={addUser} />}
           />
         </Route>
       </Routes>

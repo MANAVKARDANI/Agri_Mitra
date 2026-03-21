@@ -110,11 +110,7 @@ export default function Sidebar() {
         </nav>
 
         {/* Footer */}
-        {open && (
-          <div className="absolute bottom-5 w-full text-center text-xs text-gray-400">
-            © 2026 AGRI-MITRA
-          </div>
-        )}
+       
       </div>
     </>
   );

@@ -7,7 +7,12 @@ import {
   Shield,
 } from "lucide-react";
 
+
+import { useNavigate } from "react-router-dom";
+
 export default function Users() {
+    const navigate = useNavigate();
+
   const users = [
     {
       id: "001",
@@ -73,7 +78,10 @@ export default function Users() {
           </p>
         </div>
 
-        <button className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm">
+        <button
+          onClick={() => navigate("/admin/add-user")}
+          className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm"
+        >
           <UserPlus size={18} />
           Add New User
         </button>
