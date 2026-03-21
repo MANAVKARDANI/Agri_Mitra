@@ -13,7 +13,11 @@ import {
   Trash2,
 } from "lucide-react";
 
+import { useNavigate } from "react-router-dom";
+
 export default function Fertilizers() {
+  const navigate = useNavigate();
+
   const fertilizers = [
     {
       name: "Urea Fertilizer",
@@ -61,7 +65,10 @@ export default function Fertilizers() {
           </p>
         </div>
 
-        <button className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm">
+        <button
+          onClick={() => navigate("/admin/add-fertilizer")}
+          className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm"
+        >
           <PlusCircle size={18} />
           Add New Fertilizer
         </button>
