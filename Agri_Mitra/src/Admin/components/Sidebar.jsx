@@ -28,7 +28,13 @@ export default function Sidebar() {
       icon: <Users size={18} />,
       path: "/admin/users",
     },
-    { name: "Profile", icon: <User size={18} />, path: "/admin/profile" },
+
+    // ✅ ADMIN PROFILE (ALREADY CORRECT — JUST KEEP THIS)
+    {
+      name: "Profile",
+      icon: <User size={18} />,
+      path: "/admin/profile",
+    },
   ];
 
   return (
@@ -84,22 +90,18 @@ export default function Sidebar() {
                 `
               }
             >
-              {/* Floating Active Indicator */}
               <span className="absolute left-0 top-0 h-full w-1 bg-green-600 rounded-r opacity-0 group-hover:opacity-40 transition-all"></span>
 
-              {/* Icon */}
               <span className="transition-transform duration-200 group-hover:translate-x-1">
                 {item.icon}
               </span>
 
-              {/* Text */}
               {open && (
                 <span className="text-sm font-medium tracking-wide">
                   {item.name}
                 </span>
               )}
 
-              {/* Tooltip when collapsed */}
               {!open && (
                 <span className="absolute left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">
                   {item.name}
@@ -108,9 +110,6 @@ export default function Sidebar() {
             </NavLink>
           ))}
         </nav>
-
-        {/* Footer */}
-       
       </div>
     </>
   );

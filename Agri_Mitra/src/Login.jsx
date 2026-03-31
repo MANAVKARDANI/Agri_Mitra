@@ -76,7 +76,7 @@ export default function Login() {
               >
                 <option value="">Select Role</option>
                 <option value="Admin">Admin</option>
-                <option value="Supplier">Supplier</option>
+                {/* <option value="Supplier">Supplier</option> */}
                 <option value="User">User</option>
               </select>
             </div>

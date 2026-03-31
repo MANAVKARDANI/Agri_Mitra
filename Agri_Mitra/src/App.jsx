@@ -15,7 +15,7 @@ import Shop from "./User/Shop";
 import ShopDetails from "./User/ShopDetails";
 import About from "./User/About";
 import Contact from "./User/Contact";
-import Profile from "./User/ProfilePage";
+import UserProfile from "./User/ProfilePage"; // ✅ FIX
 import EditProfile from "./User/EditProfile";
 import ProductDetails from "./User/ProductDetails";
 import Billing from "./User/Billing";
@@ -24,6 +24,7 @@ import Billing from "./User/Billing";
 import AdminLayout from "./Admin/layout/Layout";
 
 /* Admin Pages */
+import AdminProfile from "./Admin/pages/admin_profile"; // ✅ FIX
 import Dashboard from "./Admin/pages/Dashboard";
 import Suppliers from "./Admin/pages/Suppliers";
 import Inventory from "./Admin/pages/Inventory";
@@ -35,7 +36,7 @@ import AddUser from "./Admin/pages/AddUser";
 
 function App() {
   const [fertilizers, setFertilizers] = useState([]);
-  const [users, setUsers] = useState([]); // ✅ FIX
+  const [users, setUsers] = useState([]);
 
   const addFertilizer = (item) => {
     setFertilizers((prev) => [...prev, item]);
@@ -50,6 +51,7 @@ function App() {
       <Routes>
         {/* AUTH */}
         <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
@@ -60,7 +62,7 @@ function App() {
           <Route path="/shop-details" element={<ShopDetails />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<UserProfile />} /> {/* ✅ FIX */}
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/product-details" element={<ProductDetails />} />
           <Route path="/billing" element={<Billing />} />
@@ -69,31 +71,20 @@ function App() {
         {/* ADMIN */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
-
+          <Route path="profile" element={<AdminProfile />} /> {/* ✅ FIX */}
           <Route
             path="inventory"
             element={<Inventory fertilizers={fertilizers} />}
           />
-
-          <Route
-            path="users"
-            element={<Users users={users} />}
-          />
-
+          <Route path="users" element={<Users users={users} />} />
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="orders" element={<Orders />} />
-
           <Route path="add-shop" element={<AddShop />} />
-
           <Route
             path="add-fertilizer"
             element={<AddFertilizer addFertilizer={addFertilizer} />}
           />
-
-          <Route
-            path="add-user"
-            element={<AddUser addUser={addUser} />}
-          />
+          <Route path="add-user" element={<AddUser addUser={addUser} />} />
         </Route>
       </Routes>
     </BrowserRouter>

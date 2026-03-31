@@ -15,10 +15,7 @@ export default function Layout() {
   const showLogout = authPages.includes(location.pathname);
 
   const handleLogout = () => {
-    // Clear user data (adjust if you store token differently)
     localStorage.removeItem("user");
-
-    // Redirect to login page
     navigate("/login");
   };
 
@@ -100,14 +97,14 @@ export default function Layout() {
                 My Account
               </Link>
 
-              {/* LOGOUT BUTTON (ONLY FOR PROFILE PAGES) */}
+              {/* LOGOUT BUTTON */}
               {showLogout && (
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition shadow-sm"
                 >
                   <span className="material-symbols-outlined text-base">
-                    Logout
+                    logout
                   </span>
                   Logout
                 </button>
@@ -213,27 +210,8 @@ export default function Layout() {
             <p>© 2026 AGRI-MITRA. All rights reserved.</p>
 
             <div className="flex gap-8 mt-4 md:mt-0">
-              <NavLink
-                to="/sitemap"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-green-700 font-semibold"
-                    : "hover:text-green-700"
-                }
-              >
-                Sitemap
-              </NavLink>
-
-              <NavLink
-                to="/cookies"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-green-700 font-semibold"
-                    : "hover:text-green-700"
-                }
-              >
-                Cookies
-              </NavLink>
+              <NavLink to="/sitemap">Sitemap</NavLink>
+              <NavLink to="/cookies">Cookies</NavLink>
             </div>
           </div>
         </div>

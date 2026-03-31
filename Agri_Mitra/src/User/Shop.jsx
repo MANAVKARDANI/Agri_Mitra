@@ -100,6 +100,68 @@ export default function Shop() {
         </div>
       </section>
 
+      {/* ================= SEARCH BOX (ADDED ONLY) ================= */}
+      {/* ================= SEARCH BOX (FIXED BG) ================= */}
+      <div className="relative -mt-24 z-10 flex justify-center px-6">
+        <div
+          className="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)]
+    border border-gray-100 p-8 w-full max-w-5xl"
+        >
+          <h2 className="text-xl font-semibold text-center mb-6 text-gray-700">
+            Find Local Suppliers
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-5 mb-6">
+            {/* STATE */}
+            <select
+              className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm
+        hover:bg-white hover:border-green-400 hover:shadow-sm
+        focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
+            >
+              <option>Select State</option>
+              <option>Gujarat</option>
+              <option>Maharashtra</option>
+              <option>Rajasthan</option>
+              <option>Karnataka</option>
+            </select>
+
+            {/* DISTRICT */}
+            <select
+              className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm
+        hover:bg-white hover:border-green-400 hover:shadow-sm
+        focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
+            >
+              <option>Select District</option>
+              <option>Ahmedabad</option>
+              <option>Surat</option>
+              <option>Rajkot</option>
+              <option>Pune</option>
+            </select>
+
+            {/* SHOP */}
+            <select
+              className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm
+        hover:bg-white hover:border-green-400 hover:shadow-sm
+        focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
+            >
+              <option>Select City or Shop</option>
+              <option>Farma Fer</option>
+              <option>EcoCrop Solutions</option>
+            </select>
+          </div>
+
+          {/* BUTTON */}
+          <div className="flex justify-center">
+            <button
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-xl text-sm font-semibold
+        shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300"
+            >
+               SEARCH
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* SHOP GRID */}
       <section className="py-16 bg-[#F5F5F3]">
         <div className="max-w-7xl mx-auto px-6">
@@ -113,20 +175,16 @@ export default function Shop() {
                 hover:shadow-green-200/50
                 group cursor-pointer overflow-hidden"
               >
-                {/* Gradient Hover Glow */}
                 <div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500
                 bg-gradient-to-br from-green-100/40 via-transparent to-yellow-100/40"
                 ></div>
 
-                {/* IMAGE */}
                 <div className="relative rounded-xl overflow-hidden">
                   <img
                     src={shop.img}
                     alt={shop.name}
-                    className="w-full h-48 object-cover
-                    transition-transform duration-700
-                    group-hover:scale-110"
+                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-700"
                   />
 
                   {shop.verified && (
@@ -136,7 +194,6 @@ export default function Shop() {
                   )}
                 </div>
 
-                {/* TEXT */}
                 <div className="mt-4 relative z-10">
                   <h3 className="font-bold text-lg text-gray-800 group-hover:text-green-800 transition">
                     {shop.name}
@@ -144,7 +201,6 @@ export default function Shop() {
 
                   <p className="text-sm text-gray-500 mt-1">{shop.address}</p>
 
-                  {/* BUTTON */}
                   <Link
                     to="/shop-details"
                     state={{ shop }}
@@ -152,7 +208,7 @@ export default function Shop() {
                     transition-all duration-300 group-hover:gap-3"
                   >
                     VIEW DETAILS
-                    <span className="material-icons text-[16px] transition-transform duration-300 group-hover:translate-x-1">
+                    <span className="material-icons text-[16px] group-hover:translate-x-1">
                       arrow_forward
                     </span>
                   </Link>
