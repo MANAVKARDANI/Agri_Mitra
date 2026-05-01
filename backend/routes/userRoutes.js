@@ -31,6 +31,7 @@ router.put(
   "/:id",
   authenticate,
   [
+    body("name").optional().trim().notEmpty().withMessage("Name cannot be empty"),
     body("email").optional().isEmail(),
     body("role").optional().isIn(["admin", "user", "Admin", "User"]),
     body("password").optional().isLength({ min: 6 }),

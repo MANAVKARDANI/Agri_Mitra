@@ -24,7 +24,18 @@ router.post(
   ],
   addSupplier
 );
-router.put("/:id", authenticate, authorize("admin"), editSupplier);
+router.put(
+  "/:id",
+  authenticate,
+  authorize("admin"),
+  [
+    body("name").optional().trim().notEmpty(),
+    body("contact").optional().trim().notEmpty(),
+    body("address").optional().trim().notEmpty(),
+    handleValidation,
+  ],
+  editSupplier
+);
 router.delete("/:id", authenticate, authorize("admin"), removeSupplier);
 
 export default router;

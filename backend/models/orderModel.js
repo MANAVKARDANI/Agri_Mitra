@@ -1,5 +1,11 @@
 import pool from "../config/db.js";
 
+const createOrderError = (message, statusCode) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+};
+
 export const createOrderWithItems = async ({ userId, status, items }) => {
   const client = await pool.connect();
   try {
@@ -11,7 +17,7 @@ export const createOrderWithItems = async ({ userId, status, items }) => {
       const productId = Number(item.product_id);
       const qty = Number(item.quantity);
       if (!Number.isFinite(productId) || !Number.isFinite(qty) || qty <= 0) {
-        throw new Error("Invalid order item");
+        throw createOrderError("Invalid order item", 400);
       }
 
       const productRes = await client.query(
@@ -19,11 +25,15 @@ export const createOrderWithItems = async ({ userId, status, items }) => {
         [productId]
       );
       const product = productRes.rows[0];
-      if (!product) throw new Error(`Product not found: ${productId}`);
-      if (Number(product.stock) < qty) throw new Error(`Insufficient stock for product ${productId}`);
+      if (!product) throw createOrderError(`Product not found: ${productId}`, 404);
+      if (Number(product.stock) < qty) {
+        throw createOrderError(`Insufficient stock for product ${productId}`, 400);
+      }
 
       const unitPrice = Number(product.price);
-      if (!Number.isFinite(unitPrice)) throw new Error(`Invalid price for product ${productId}`);
+      if (!Number.isFinite(unitPrice)) {
+        throw createOrderError(`Invalid price for product ${productId}`, 500);
+      }
       priceByProductId.set(productId, unitPrice);
       totalAmount += unitPrice * qty;
     }
@@ -42,7 +52,9 @@ export const createOrderWithItems = async ({ userId, status, items }) => {
       const productId = Number(item.product_id);
       const qty = Number(item.quantity);
       const unitPrice = Number(priceByProductId.get(productId));
-      if (!Number.isFinite(unitPrice)) throw new Error(`Invalid derived price for product ${productId}`);
+      if (!Number.isFinite(unitPrice)) {
+        throw createOrderError(`Invalid derived price for product ${productId}`, 500);
+      }
 
       await client.query(
         `

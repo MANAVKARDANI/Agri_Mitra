@@ -12,7 +12,9 @@ export const createOrder = async (req, res) => {
     const order = await createOrderWithItems({ userId, status, items });
     return res.status(201).json(order);
   } catch (error) {
-    return res.status(500).json({ message: "Failed to create order", error: error.message });
+    return res
+      .status(error.statusCode || 500)
+      .json({ message: error.message || "Failed to create order" });
   }
 };
 

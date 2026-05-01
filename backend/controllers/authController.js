@@ -35,6 +35,9 @@ export const register = async (req, res) => {
     const token = signToken(user);
     return res.status(201).json({ token, user });
   } catch (error) {
+    if (error.code === "23505") {
+      return res.status(409).json({ message: "Email already registered" });
+    }
     return res.status(500).json({ message: "Registration failed", error: error.message });
   }
 };

@@ -37,6 +37,9 @@ export const updateUser = async (req, res) => {
     if (email) payload.email = email;
     if (role && isAdmin) payload.role = role.toLowerCase() === "admin" ? "admin" : "user";
     if (password) payload.password = await bcrypt.hash(password, 10);
+    if (!Object.keys(payload).length) {
+      return res.status(400).json({ message: "No valid user fields provided" });
+    }
 
     const updated = await updateUserById(userId, payload);
     if (!updated) {
@@ -44,6 +47,9 @@ export const updateUser = async (req, res) => {
     }
     return res.json(updated);
   } catch (error) {
+    if (error.code === "23505") {
+      return res.status(409).json({ message: "Email already registered" });
+    }
     return res.status(500).json({ message: "Failed to update user", error: error.message });
   }
 };
@@ -68,6 +74,9 @@ export const createManagedUser = async (req, res) => {
 
     return res.status(201).json(user);
   } catch (error) {
+    if (error.code === "23505") {
+      return res.status(409).json({ message: "Email already registered" });
+    }
     return res.status(500).json({ message: "Failed to create user", error: error.message });
   }
 };

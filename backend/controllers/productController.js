@@ -49,6 +49,9 @@ export const editProduct = async (req, res) => {
     if (req.body.image !== undefined) payload.image = req.body.image;
     if (req.body.price !== undefined) payload.price = Number(req.body.price);
     if (req.body.stock !== undefined) payload.stock = Number(req.body.stock);
+    if (!Object.keys(payload).length) {
+      return res.status(400).json({ message: "No valid product fields provided" });
+    }
     const product = await updateProductById(Number(req.params.id), payload);
     if (!product) return res.status(404).json({ message: "Product not found" });
     return res.json(product);

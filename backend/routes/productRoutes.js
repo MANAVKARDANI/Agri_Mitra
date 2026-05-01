@@ -26,7 +26,20 @@ router.post(
   ],
   addProduct
 );
-router.put("/:id", authenticate, authorize("admin"), editProduct);
+router.put(
+  "/:id",
+  authenticate,
+  authorize("admin"),
+  [
+    body("name").optional().trim().notEmpty(),
+    body("description").optional().isString(),
+    body("image").optional().isString(),
+    body("price").optional().isFloat({ min: 0 }),
+    body("stock").optional().isInt({ min: 0 }),
+    handleValidation,
+  ],
+  editProduct
+);
 router.delete("/:id", authenticate, authorize("admin"), removeProduct);
 
 export default router;

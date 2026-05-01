@@ -30,6 +30,9 @@ export const editSupplier = async (req, res) => {
     if (req.body.name !== undefined) payload.name = req.body.name;
     if (req.body.contact !== undefined) payload.contact = req.body.contact;
     if (req.body.address !== undefined) payload.address = req.body.address;
+    if (!Object.keys(payload).length) {
+      return res.status(400).json({ message: "No valid supplier fields provided" });
+    }
     const supplier = await updateSupplierById(Number(req.params.id), payload);
     if (!supplier) return res.status(404).json({ message: "Supplier not found" });
     return res.json(supplier);
