@@ -1,9 +1,14 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import RegisterImage from "./assets/register.png";
+import { useAuth } from "./context/AuthContext";
+import { useToast } from "./context/ToastContext";
 
 
 export default function Register() {
+  const navigate = useNavigate();
+  const { register, loading } = useAuth();
+  const { showSuccess, showError } = useToast();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -20,9 +25,34 @@ export default function Register() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Register Data:", formData);
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+      showError("Please fill all required fields.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      showError("Please enter a valid email.");
+      return;
+    }
+    if (formData.password.length < 6) {
+      showError("Password must be at least 6 characters.");
+      return;
+    }
+    try {
+      const name = `${formData.firstName} ${formData.lastName}`.trim();
+      await register({
+        name: name || formData.businessName || "Agri User",
+        email: formData.email,
+        password: formData.password,
+        role: "user",
+      });
+      showSuccess("Account created successfully.");
+      navigate("/home");
+    } catch (error) {
+      showError(error?.response?.data?.message || "Registration failed");
+    }
   };
 
   return (
@@ -48,7 +78,7 @@ export default function Register() {
               <h2 className="text-4xl font-bold mt-2">10k+</h2>
 
               <p className="text-sm opacity-80 mt-2">
-                Farmers optimizing yields daily.
+                Farmers optimizing update daily.
               </p>
             </div>
 
@@ -145,9 +175,10 @@ export default function Register() {
               {/* Submit */}
               <button
                 type="submit"
+                disabled={loading}
                 className="w-full bg-green-800 hover:bg-green-900 text-white py-3 rounded-lg font-semibold shadow-md transition"
               >
-                Create Account
+                {loading ? "Creating..." : "Create Account"}
               </button>
 
             </form>
@@ -156,17 +187,17 @@ export default function Register() {
             <div className="flex items-center my-6">
 
               <div className="flex-grow border-t border-gray-300"></div>
-
+{/* 
               <span className="px-4 text-sm text-gray-400">
                 OR JOIN WITH
-              </span>
+              </span> */}
 
               <div className="flex-grow border-t border-gray-300"></div>
 
             </div>
 
             {/* Social Buttons */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-2 gap-4">
 
               <button className="border rounded-lg py-2 text-sm font-medium hover:bg-gray-50">
                 Google
@@ -176,7 +207,7 @@ export default function Register() {
                 Apple
               </button>
 
-            </div>
+            </div> */}
 
             <p className="text-center text-sm text-gray-500 mt-6">
 

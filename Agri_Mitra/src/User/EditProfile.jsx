@@ -1,38 +1,41 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { usersApi } from "../services/api";
+import { useToast } from "../context/ToastContext";
 
 export default function EditProfile() {
   const navigate = useNavigate();
+  const { user, updateStoredUser } = useAuth();
+  const { showSuccess, showError } = useToast();
 
-  const [image, setImage] = useState(
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuBzkYu5I16QjD3rwGS-AR1eV2szNmQx_YnJv26W353TfKEeTAcuLKjf5JlALV7oRbMtUlwwvXm9S928ZXUoFt4aEHZdvMLepmCk0r0vdYRY9Ohp5QwMam0AC5YybXQmYZ2SEUv2kbyo5af42i9BQNh8MSRY43Y894gH02jWmO7OsEAonYmMrKHbVXO4IrEBTcY1YwivoAGnQfT2-E6fYlKqPCOI_oG9Ry9YjKsZguv2ISmwWN25cn4Uz7GRN0oy7hLKji30FaKXxtIq",
-  );
-
-  const [name, setName] = useState("Hirva Togadiya");
-  const [email, setEmail] = useState("hirva203@gmail.com");
+  const [name, setName] = useState(user?.name || "Hirva Togadiya");
+  const [email, setEmail] = useState(user?.email || "hirva203@gmail.com");
 
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setImage(imageUrl);
-    }
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log({
-      name,
-      email,
-      image,
-    });
-
-    alert("Profile Updated Successfully");
+    if (!name.trim() || !email.trim()) {
+      showError("Name and email are required.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showError("Please enter a valid email.");
+      return;
+    }
+    try {
+      if (user?.id) {
+        const { data } = await usersApi.update(user.id, { name, email });
+        updateStoredUser(data);
+      }
+      showSuccess("Profile updated successfully.");
+      navigate("/profile");
+    } catch {
+      showError("Failed to update profile");
+    }
   };
 
   return (
@@ -41,14 +44,14 @@ export default function EditProfile() {
         {/* PROFILE IMAGE */}
         <div className="flex flex-col items-center mb-8">
           <div className="relative">
-            <img
+            {/* <img
               src={image}
               className="w-24 h-24 rounded-full object-cover"
               alt="profile"
-            />
+            /> */}
 
             {/* IMAGE UPLOAD */}
-            <label className="absolute bottom-0 right-0 bg-green-700 text-white rounded-full w-7 h-7 flex items-center justify-center shadow cursor-pointer">
+            {/* <label className="absolute bottom-0 right-0 bg-green-700 text-white rounded-full w-7 h-7 flex items-center justify-center shadow cursor-pointer">
               <span className="material-symbols-outlined text-sm">edit</span>
 
               <input
@@ -57,7 +60,7 @@ export default function EditProfile() {
                 className="hidden"
                 onChange={handleImageUpload}
               />
-            </label>
+            </label> */}
           </div>
 
           <h2 className="text-xl font-bold text-gray-800 mt-4">{name}</h2>

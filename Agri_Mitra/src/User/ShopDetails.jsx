@@ -1,23 +1,35 @@
+import { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
+import { productsApi } from "../services/api";
+import UreaImage from "../assets/UREA.png";
+import PotashImage from "../assets/potash.png";
+import BioDapImage from "../assets/Bio dap.png";
+import CalciumImage from "../assets/Calcium Nitrate.png";
+
+const fallbackImages = [UreaImage, PotashImage, BioDapImage, CalciumImage];
 
 export default function ShopDetails() {
   const { state } = useLocation();
   const shop = state?.shop;
 
-  const products = [
-    {
-      name: "Imported Super Potash",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuC7Jm8GLbEwAHCTT_8QFWbEb-9R6T5YkKeffvSOw14l39IkP7IZZuvfcph_2ist3WMYtZ9-IvgF2A3XjpDKyP1GraRFvOd5eP_wtBNU3gJu1B18qUR4kNQ-ZMIlkGK09oLTTUwp2DgjFgsJO6cSC9Raw1o_qXbAff4YXonKVLIRRxeZZtu5vrKYRENB4NJirbI66WOVgm9Iinpdp4-y1FX8s1Vk_BR03Q-vIfY1KmMEWGetJIkANMqfVEJ9TYqQ8fveWlDBy09zBYF8",
-    },
-    {
-      name: "Imported Super Potash",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA9rVWhr87ckLMJoHj2n4CI005nMa-jvrPDXL22l198wem2IqAvSeIfkgf24358jtyzUWN_u4blmhUtCYUgeGLoq2gXtSxaCbyMFQCtKk-d3eumvHpyAuQEYeU4kLNZRyO-lOH-ygRuWi_Uin0zRtfoMzSxMpJA-lUY-yEH2K2tviz2870iQOh-CbZ2eOCYWjBhlvbQ40lyzDFI7v7_aw3GOFYFyHO1BA-T_xGyKt7ceAH-VoIbweiwDjxo4DUKt2weusOCLwBgjh2M",
-    },
-    {
-      name: "Imported Super Potash",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDk_zRdYcwQ3uHqGBFidUkC9Umi56sO9j90908UrBbwwqjQ0ncYosZyX5EaVbQYGLkl_YPzWywBkHpljwp-SwFOyxWtj0WTbTCSe8avKsNegAfxuk0txIw5EsvjQ3qtHWQowJDnUOaRJswYR8LgNt-EpUdkqOtZem09jVI6yo5GK-vIRFi_vfR97Cvo5hVP34-PM0QwkTbhiLM91DRRDJh9vKyvGtYpo8nxRz4DwBOhd5n16iZmjliGqWd8pFwkThhxQymdfNQMbMTs",
-    },
-  ];
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const { data } = await productsApi.getAll();
+        setProducts(
+          data.map((product, index) => ({
+            ...product,
+            image: product.image || fallbackImages[index % fallbackImages.length],
+          }))
+        );
+      } catch {
+        setProducts([]);
+      }
+    };
+    loadProducts();
+  }, []);
 
   if (!shop) {
     return (
@@ -95,9 +107,9 @@ export default function ShopDetails() {
         <h2 className="text-3xl font-bold mb-10">Our Fertilizers</h2>
 
         <div className="grid md:grid-cols-3 gap-10">
-          {products.map((p, index) => (
+          {products.map((p) => (
             <div
-              key={index}
+              key={p.id}
               className="
               bg-white border rounded-3xl p-8 text-center
               transition-all duration-500
@@ -109,7 +121,7 @@ export default function ShopDetails() {
               {/* IMAGE */}
               <div className="bg-gray-50 rounded-2xl p-10 mb-6 overflow-hidden">
                 <img
-                  src={p.img}
+                  src={p.image}
                   alt={p.name}
                   className="
                   h-40 mx-auto object-contain

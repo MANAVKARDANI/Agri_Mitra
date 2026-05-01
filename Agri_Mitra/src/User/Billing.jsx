@@ -1,21 +1,63 @@
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ordersApi } from "../services/api";
+import { useCart } from "../context/CartContext";
+import { useToast } from "../context/ToastContext";
 
 export default function Billing() {
   const [payment, setPayment] = useState("UPI");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  const { items, clear } = useCart();
+  const { showSuccess, showError } = useToast();
 
-  const product = {
-    name: "Potash",
-    price: 499,
-    qty: 1,
-  };
+  const single = state
+    ? [
+        {
+          name: state.name,
+          product_id: state.product_id,
+          price: state.price,
+          quantity: state.quantity,
+        },
+      ]
+    : [];
+  const cartItems = items?.length ? items : single;
 
-  const subtotal = product.price * product.qty;
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + Number(item.price) * Number(item.quantity),
+    0
+  );
   const tax = subtotal * 0.05;
   const total = subtotal + tax;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Payment Successful!");
+    if (!cartItems.length) {
+      showError("Your cart is empty.");
+      return;
+    }
+    if (!fullName.trim() || !phone.trim() || !address.trim()) {
+      showError("Please fill billing details.");
+      return;
+    }
+    try {
+      await ordersApi.create({
+        status: "pending",
+        items: cartItems.map((item) => ({
+          product_id: Number(item.product_id || 1),
+          quantity: Number(item.quantity),
+          price: Number(item.price),
+        })),
+      });
+      clear();
+      showSuccess("Order placed successfully.");
+      navigate("/profile");
+    } catch {
+      showError("Failed to place order");
+    }
   };
 
   return (
@@ -35,6 +77,8 @@ export default function Billing() {
                   <input
                     required
                     type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
                     placeholder="John Doe"
                     className="mt-2 w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-700 outline-none"
                   />
@@ -46,6 +90,8 @@ export default function Billing() {
                   <input
                     required
                     type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     placeholder="+91 98765 43210"
                     className="mt-2 w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-700 outline-none"
                   />
@@ -61,6 +107,8 @@ export default function Billing() {
                 <textarea
                   required
                   rows="3"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   placeholder="Street address, City, State, ZIP"
                   className="mt-2 w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-700 outline-none"
                 />
@@ -113,14 +161,15 @@ export default function Billing() {
             <h2 className="text-lg font-bold mb-6">Order Summary</h2>
 
             <div className="space-y-4 text-sm">
-              <div className="flex justify-between">
-                <div>
-                  <p className="font-medium">{product.name}</p>
-                  <p className="text-gray-400">Qty: {product.qty}</p>
+              {cartItems.map((item) => (
+                <div key={item.product_id} className="flex justify-between">
+                  <div>
+                    <p className="font-medium">{item.name}</p>
+                    <p className="text-gray-400">Qty: {item.quantity}</p>
+                  </div>
+                  <p>Rs. {item.price}</p>
                 </div>
-
-                <p>Rs. {product.price}</p>
-              </div>
+              ))}
 
               <hr />
 

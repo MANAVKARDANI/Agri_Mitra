@@ -5,17 +5,19 @@ import {
   useNavigate,
   useLocation,
 } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
 
   // Pages where logout should appear
   const authPages = ["/profile", "/edit-profile"];
   const showLogout = authPages.includes(location.pathname);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    logout();
     navigate("/login");
   };
 

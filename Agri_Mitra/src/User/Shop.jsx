@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { suppliersApi } from "../services/api";
 
 import HeroShop from "../assets/Hero_shop.png";
 
@@ -12,68 +13,32 @@ import Modern from "../assets/Modern Farmer Supply.png";
 import Plant from "../assets/Plant Power Store.png";
 import Root from "../assets/Root & Shoot Suppliers.png";
 
+const localImages = [FarmaFer, Valley, EcoCrop, Growers, Nature, Modern, Plant, Root];
+
 export default function Shop() {
-  const shops = [
-    {
-      id: "farma-fer",
-      name: "Farma Fer",
-      img: FarmaFer,
-      address: "124 Agri Lane, West Valley District, CA 90210",
-      verified: true,
-    },
-    {
-      id: "valley-fertilizers",
-      name: "Valley Fertilizers",
-      img: Valley,
-      address: "88 Farm Road, East District, TX 75001",
-      verified: true,
-    },
-    {
-      id: "eco-crop",
-      name: "EcoCrop Solutions",
-      img: EcoCrop,
-      address: "45 Sustainable Way, North Zone, FL 33101",
-      verified: true,
-    },
-    {
-      id: "growers-choice",
-      name: "Growers Choice",
-      img: Growers,
-      address: "22 Plantation Drive, South Region, CA 92000",
-      verified: false,
-    },
-    {
-      id: "natures-best",
-      name: "Nature's Best Agri",
-      img: Nature,
-      address: "78 Organic Blvd, Central City, TX 78701",
-      verified: false,
-    },
-    {
-      id: "modern-farmer",
-      name: "Modern Farmer Supply",
-      img: Modern,
-      address: "101 Innovation Road, Tech Park, CA 94000",
-      verified: true,
-    },
-    {
-      id: "plant-power",
-      name: "Plant Power Store",
-      img: Plant,
-      address: "33 Green Avenue, Suburbia, FL 32801",
-      verified: false,
-    },
-    {
-      id: "root-shoot",
-      name: "Root & Shoot Suppliers",
-      img: Root,
-      address: "56 Growth Street, Farmland, TX 76000",
-      verified: false,
-    },
-  ];
+  const [shops, setShops] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const shopsPerPage = 8;
+
+  useEffect(() => {
+    const loadShops = async () => {
+      try {
+        const { data } = await suppliersApi.getAll();
+        const mapped = data.map((shop, index) => ({
+          id: shop.id,
+          name: shop.name,
+          img: localImages[index % localImages.length],
+          address: shop.address,
+          verified: true,
+        }));
+        setShops(mapped);
+      } catch {
+        setShops([]);
+      }
+    };
+    loadShops();
+  }, []);
 
   const indexOfLastShop = currentPage * shopsPerPage;
   const indexOfFirstShop = indexOfLastShop - shopsPerPage;

@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import {
   PlusCircle,
   Search,
@@ -14,42 +15,46 @@ import {
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
+import { productsApi } from "../../services/api";
+import { useToast } from "../../context/ToastContext";
 
 export default function Fertilizers() {
   const navigate = useNavigate();
+  const { showError } = useToast();
+  const [fertilizers, setFertilizers] = useState([]);
 
-  const fertilizers = [
-    {
-      name: "Urea Fertilizer",
-      supplier: "Green Agro",
-      price: "₹500",
-      stock: "200 units",
-      stockColor: "bg-green-100 text-green-700",
-      status: "High Stock",
-      statusColor: "text-green-600",
-      icon: <Leaf size={18} className="text-green-600" />,
-    },
-    {
-      name: "Organic Compost",
-      supplier: "Organic Hub",
-      price: "₹800",
-      stock: "150 units",
-      stockColor: "bg-yellow-100 text-yellow-700",
-      status: "Moderate",
-      statusColor: "text-yellow-600",
-      icon: <Leaf size={18} className="text-orange-500" />,
-    },
-    {
-      name: "Liquid Nitrogen",
-      supplier: "Chemical Pros",
-      price: "₹1,200",
-      stock: "12 units",
-      stockColor: "bg-red-100 text-red-700",
-      status: "Critical",
-      statusColor: "text-red-600",
-      icon: <Droplet size={18} className="text-red-500" />,
-    },
-  ];
+  const loadFertilizers = async () => {
+    try {
+      const { data } = await productsApi.getAll();
+      setFertilizers(data);
+    } catch {
+      setFertilizers([]);
+    }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadFertilizers();
+  }, []);
+
+  const lowStockCount = useMemo(
+    () => fertilizers.filter((item) => Number(item.stock) < 50).length,
+    [fertilizers]
+  );
+
+  const totalStock = useMemo(
+    () => fertilizers.reduce((sum, item) => sum + Number(item.stock || 0), 0),
+    [fertilizers]
+  );
+
+  const handleDelete = async (id) => {
+    try {
+      await productsApi.remove(id);
+      loadFertilizers();
+    } catch {
+      showError("Failed to delete fertilizer");
+    }
+  };
 
   return (
     <div className="p-6 space-y-8 bg-gray-50 min-h-screen">
@@ -84,7 +89,7 @@ export default function Fertilizers() {
           </div>
 
           <h2 className="text-2xl font-bold">
-            350 <span className="text-gray-400 text-sm">Units</span>
+            {totalStock} <span className="text-gray-400 text-sm">Units</span>
           </h2>
 
           <p className="text-green-600 text-xs mt-2">+12% from last month</p>
@@ -97,7 +102,7 @@ export default function Fertilizers() {
           </div>
 
           <h2 className="text-2xl font-bold">
-            2 <span className="text-gray-400 text-sm">Items</span>
+            {lowStockCount} <span className="text-gray-400 text-sm">Items</span>
           </h2>
 
           <p className="text-xs text-gray-400 mt-2">
@@ -168,37 +173,54 @@ export default function Fertilizers() {
           {/* BODY */}
 
           <tbody>
-            {fertilizers.map((item, index) => (
-              <tr key={index} className="border-b hover:bg-gray-50">
+            {fertilizers.map((item) => {
+              const stockNum = Number(item.stock || 0);
+              const isHigh = stockNum > 150;
+              const isModerate = stockNum > 50 && stockNum <= 150;
+              const stockColor = isHigh
+                ? "bg-green-100 text-green-700"
+                : isModerate
+                  ? "bg-yellow-100 text-yellow-700"
+                  : "bg-red-100 text-red-700";
+              const statusColor = isHigh
+                ? "text-green-600"
+                : isModerate
+                  ? "text-yellow-600"
+                  : "text-red-600";
+              const status = isHigh ? "High Stock" : isModerate ? "Moderate" : "Critical";
+              return (
+              <tr key={item.id} className="border-b hover:bg-gray-50">
                 {/* NAME */}
 
                 <td className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="bg-gray-100 p-3 rounded-lg">
-                      {item.icon}
+                      {stockNum < 50 ? (
+                        <Droplet size={18} className="text-red-500" />
+                      ) : (
+                        <Leaf size={18} className="text-green-600" />
+                      )}
                     </div>
 
-                    <span className="font-medium text-gray-800">
-                      {item.name}
-                    </span>
+                    <span className="font-medium text-gray-800">{item.name}</span>
                   </div>
                 </td>
 
                 {/* SUPPLIER */}
 
-                <td className="text-gray-600">{item.supplier}</td>
+                <td className="text-gray-600">Supplier</td>
 
                 {/* PRICE */}
 
-                <td className="font-semibold text-gray-800">{item.price}</td>
+                <td className="font-semibold text-gray-800">₹{item.price}</td>
 
                 {/* STOCK */}
 
                 <td>
                   <span
-                    className={`text-xs px-3 py-1 rounded-full font-medium ${item.stockColor}`}
+                    className={`text-xs px-3 py-1 rounded-full font-medium ${stockColor}`}
                   >
-                    {item.stock}
+                    {item.stock} units
                   </span>
                 </td>
 
@@ -206,11 +228,11 @@ export default function Fertilizers() {
 
                 <td>
                   <div
-                    className={`flex items-center gap-2 text-xs font-medium ${item.statusColor}`}
+                    className={`flex items-center gap-2 text-xs font-medium ${statusColor}`}
                   >
                     <span className="w-2 h-2 rounded-full bg-current"></span>
 
-                    {item.status}
+                    {status}
                   </div>
                 </td>
 
@@ -222,13 +244,13 @@ export default function Fertilizers() {
                       <Pencil size={16} />
                     </button>
 
-                    <button className="hover:text-red-600 transition">
+                    <button className="hover:text-red-600 transition" onClick={() => handleDelete(item.id)}>
                       <Trash2 size={16} />
                     </button>
                   </div>
                 </td>
               </tr>
-            ))}
+            )})}
           </tbody>
         </table>
         {/* PAGINATION */}

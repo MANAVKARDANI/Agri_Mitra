@@ -1,0 +1,49 @@
+import {
+  createSupplier,
+  deleteSupplierById,
+  listSuppliers,
+  updateSupplierById,
+} from "../models/supplierModel.js";
+
+export const getSuppliers = async (_req, res) => {
+  try {
+    const suppliers = await listSuppliers();
+    return res.json(suppliers);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to fetch suppliers", error: error.message });
+  }
+};
+
+export const addSupplier = async (req, res) => {
+  try {
+    const { name, contact, address } = req.body;
+    const supplier = await createSupplier({ name, contact, address });
+    return res.status(201).json(supplier);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to create supplier", error: error.message });
+  }
+};
+
+export const editSupplier = async (req, res) => {
+  try {
+    const payload = {};
+    if (req.body.name !== undefined) payload.name = req.body.name;
+    if (req.body.contact !== undefined) payload.contact = req.body.contact;
+    if (req.body.address !== undefined) payload.address = req.body.address;
+    const supplier = await updateSupplierById(Number(req.params.id), payload);
+    if (!supplier) return res.status(404).json({ message: "Supplier not found" });
+    return res.json(supplier);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to update supplier", error: error.message });
+  }
+};
+
+export const removeSupplier = async (req, res) => {
+  try {
+    const ok = await deleteSupplierById(Number(req.params.id));
+    if (!ok) return res.status(404).json({ message: "Supplier not found" });
+    return res.json({ message: "Supplier deleted" });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to delete supplier", error: error.message });
+  }
+};

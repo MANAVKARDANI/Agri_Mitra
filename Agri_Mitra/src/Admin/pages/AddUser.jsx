@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, UserPlus, User, ShieldCheck, Shield } from "lucide-react";
+import { usersApi } from "../../services/api";
+import { useToast } from "../../context/ToastContext";
 
-export default function AddUser({ addUser }) {
+export default function AddUser() {
   const navigate = useNavigate();
+  const { showSuccess, showError } = useToast();
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -37,30 +40,30 @@ export default function AddUser({ addUser }) {
     let e = {};
     if (!form.name) e.name = "Required";
     if (!form.email) e.email = "Required";
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Invalid email";
     if (!form.password) e.password = "Required";
+    if (form.password && form.password.length < 6) e.password = "Min 6 chars";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (!validate()) return;
-
-    const newUser = {
-      id: Date.now().toString().slice(-3),
-      name: form.name,
-      email: form.email,
-      role: form.role,
-      initials: form.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase(),
-    };
-
-    if (addUser) addUser(newUser);
-
-    alert("User Created Successfully ✅");
-    navigate("/admin/users");
+  const handleSubmit = async () => {
+    if (!validate()) {
+      showError("Please correct form errors.");
+      return;
+    }
+    try {
+      await usersApi.create({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        role: form.role.toLowerCase(),
+      });
+      showSuccess("User created successfully.");
+      navigate("/admin/users");
+    } catch {
+      showError("Failed to create user");
+    }
   };
 
   return (

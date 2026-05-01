@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
 export default function ProductDetails() {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const { addItem } = useCart();
 
   const [quantity, setQuantity] = useState(1);
 
-  const product = {
+  const product = state?.product || {
+    id: 0,
     name: "Potash",
     price: 499,
     stock: 23,
@@ -27,9 +31,17 @@ export default function ProductDetails() {
   };
 
   const handleBooking = () => {
+    addItem({
+      name: product.name,
+      product_id: product.id,
+      price: product.price,
+      quantity,
+      image: product.image,
+    });
     navigate("/billing", {
       state: {
         name: product.name,
+        product_id: product.id,
         price: product.price,
         quantity: quantity,
         image: product.image,

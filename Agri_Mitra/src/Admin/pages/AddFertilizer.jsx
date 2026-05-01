@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UploadCloud, ChevronDown, Pencil, Trash2 } from "lucide-react";
+import { productsApi } from "../../services/api";
+import { useToast } from "../../context/ToastContext";
 
-export default function AddFertilizer({ addFertilizer }) {
+export default function AddFertilizer() {
   const navigate = useNavigate();
+  const { showSuccess, showError } = useToast();
 
   const [form, setForm] = useState({
     name: "",
@@ -17,30 +20,30 @@ export default function AddFertilizer({ addFertilizer }) {
   const validate = () => {
     let e = {};
     if (!form.name) e.name = "Required";
-    if (!form.supplier) e.supplier = "Required";
+    if (!form.supplier || form.supplier === "Select a supplier") e.supplier = "Required";
     if (!form.price || Number(form.price) <= 0) e.price = "Invalid";
-    if (!form.stock) e.stock = "Required";
+    if (!form.stock || Number(form.stock) < 0) e.stock = "Required";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (!validate()) return;
-
-    const stockNum = Number(form.stock);
-
-    const newItem = {
-      ...form,
-      price: `₹${form.price}`,
-      stock: `${form.stock} units`,
-      status:
-        stockNum > 150 ? "High Stock" : stockNum > 50 ? "Moderate" : "Critical",
-    };
-
-    if (addFertilizer) addFertilizer(newItem);
-
-    alert("Fertilizer Added Successfully ✅");
-    navigate("/admin/inventory");
+  const handleSubmit = async () => {
+    if (!validate()) {
+      showError("Please fill valid product details.");
+      return;
+    }
+    try {
+      await productsApi.create({
+        name: form.name,
+        description: "",
+        price: Number(form.price),
+        stock: Number(form.stock),
+      });
+      showSuccess("Fertilizer added successfully.");
+      navigate("/admin/inventory");
+    } catch {
+      showError("Failed to add fertilizer");
+    }
   };
 
   return (
@@ -97,6 +100,9 @@ export default function AddFertilizer({ addFertilizer }) {
                   className="absolute right-3 top-3 text-gray-400"
                 />
               </div>
+              {errors.supplier && (
+                <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
+              )}
             </div>
 
             <div>
@@ -107,6 +113,9 @@ export default function AddFertilizer({ addFertilizer }) {
                 placeholder="₹ 0.00"
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
               />
+              {errors.price && (
+                <p className="text-red-500 text-xs mt-1">{errors.price}</p>
+              )}
             </div>
 
             <div>
@@ -119,6 +128,9 @@ export default function AddFertilizer({ addFertilizer }) {
                 placeholder="e.g., 200"
                 onChange={(e) => setForm({ ...form, stock: e.target.value })}
               />
+              {errors.stock && (
+                <p className="text-red-500 text-xs mt-1">{errors.stock}</p>
+              )}
             </div>
           </div>
         </div>

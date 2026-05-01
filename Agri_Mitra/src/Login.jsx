@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import loginImage from "./assets/login.png";
+import { useAuth } from "./context/AuthContext";
+import { useToast } from "./context/ToastContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login, loading } = useAuth();
+  const { showSuccess, showError } = useToast();
 
   const [formData, setFormData] = useState({
     role: "",
@@ -18,28 +22,26 @@ export default function Login() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log("Login Data:", formData);
-
-    const adminEmail = "admin@gmail.com";
-
-    // Admin Login
-    if (formData.role === "Admin" && formData.email === adminEmail) {
-      navigate("/admin/dashboard");
+    if (!formData.role || !formData.email || !formData.password) {
+      showError("Please fill all login fields.");
+      return;
     }
-
-    // User Login
-    else if (formData.role === "User") {
-      navigate("/home");
-    }
-
-    // Supplier Login
-    else if (formData.role === "Supplier") {
-      navigate("/home");
-    } else {
-      alert("Invalid Admin Email or Role!");
+    try {
+      const user = await login({
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+      });
+      showSuccess("Login successful.");
+      if (user.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/home");
+      }
+    } catch (error) {
+      showError(error?.response?.data?.message || error.message || "Login failed");
     }
   };
 
@@ -123,9 +125,10 @@ export default function Login() {
             {/* Login Button */}
             <button
               type="submit"
+              disabled={loading}
               className="w-full bg-green-800 hover:bg-green-900 text-white py-3 rounded-full font-semibold transition"
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
 
