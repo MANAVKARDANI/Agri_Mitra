@@ -165,6 +165,35 @@ try {
   });
   expectStatus(emptyProfileUpdate, 400, "empty profile update");
 
+  const profileNameUpdate = await request(`/users/${register.body.user.id}`, {
+    method: "PUT",
+    token: userToken,
+    body: { name: "Smoke User Updated" },
+  });
+  expectStatus(profileNameUpdate, 200, "self profile name update");
+  assert(profileNameUpdate.body.name === "Smoke User Updated", "profile name update should persist");
+
+  const passwordUpdateWithoutCurrent = await request(`/users/${register.body.user.id}`, {
+    method: "PUT",
+    token: userToken,
+    body: { password: "User456!" },
+  });
+  expectStatus(passwordUpdateWithoutCurrent, 400, "password update requires current password");
+
+  const passwordUpdateWithWrongCurrent = await request(`/users/${register.body.user.id}`, {
+    method: "PUT",
+    token: userToken,
+    body: { currentPassword: "Wrong123!", password: "User456!" },
+  });
+  expectStatus(passwordUpdateWithWrongCurrent, 401, "password update rejects wrong current password");
+
+  const passwordUpdateWithCurrent = await request(`/users/${register.body.user.id}`, {
+    method: "PUT",
+    token: userToken,
+    body: { currentPassword: "User123!", password: "User456!" },
+  });
+  expectStatus(passwordUpdateWithCurrent, 200, "password update with current password");
+
   const previousNodeEnv = process.env.NODE_ENV;
   process.env.NODE_ENV = "production";
   const forgotPassword = await request("/auth/forgot-password", {
@@ -295,6 +324,46 @@ try {
   assert(
     Number(createdOrder.items[0].price) === Number(smokeProduct.price),
     "stored order item price should match the database product price"
+  );
+
+  const addToCart = await request("/cart/items", {
+    method: "POST",
+    token: userToken,
+    body: {
+      product_id: smokeProduct.id,
+      quantity: 2,
+    },
+  });
+  expectStatus(addToCart, 201, "cart add item");
+  assert(
+    addToCart.body.some((item) => item.product_id === smokeProduct.id && Number(item.quantity) === 2),
+    "cart should contain the added product and quantity"
+  );
+
+  const updateCart = await request(`/cart/items/${smokeProduct.id}`, {
+    method: "PUT",
+    token: userToken,
+    body: {
+      quantity: 3,
+    },
+  });
+  expectStatus(updateCart, 200, "cart quantity update");
+  assert(
+    updateCart.body.some((item) => item.product_id === smokeProduct.id && Number(item.quantity) === 3),
+    "cart quantity update should persist"
+  );
+
+  const clearCart = await request("/cart", {
+    method: "DELETE",
+    token: userToken,
+    body: {
+      product_ids: [smokeProduct.id],
+    },
+  });
+  expectStatus(clearCart, 200, "cart selected item clear");
+  assert(
+    !clearCart.body.some((item) => item.product_id === smokeProduct.id),
+    "selected cart item should be removed"
   );
 
   console.log("Smoke tests passed");

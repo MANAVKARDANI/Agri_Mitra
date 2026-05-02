@@ -18,6 +18,7 @@ import UserProfile from "./User/ProfilePage"; // ✅ FIX
 import EditProfile from "./User/EditProfile";
 import ProductDetails from "./User/ProductDetails";
 import Billing from "./User/Billing";
+import CartPage from "./User/CartPage";
 import InfoPage from "./pages/InfoPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
@@ -128,6 +129,7 @@ function App() {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/edit-profile" element={<EditProfile />} />
             <Route path="/product-details" element={<ProductDetails />} />
+            <Route path="/cart" element={<CartPage />} />
             <Route path="/billing" element={<Billing />} />
             <Route
               path="/privacy"

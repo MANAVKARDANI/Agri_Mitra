@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useToast } from "../context/ToastContext";
 
 export default function ProductDetails() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { addItem } = useCart();
+  const { showError, showSuccess } = useToast();
 
   const [quantity, setQuantity] = useState(1);
 
@@ -30,21 +32,35 @@ export default function ProductDetails() {
     }
   };
 
+  const handleAddToCart = async () => {
+    if (!product.id) {
+      showError("This product cannot be added to cart.");
+      return;
+    }
+    try {
+      await addItem({
+        product_id: product.id,
+        quantity,
+      });
+      showSuccess(`${product.name} added to cart.`);
+    } catch (error) {
+      showError(error?.response?.data?.message || "Failed to add item to cart.");
+    }
+  };
+
   const handleBooking = () => {
-    addItem({
-      name: product.name,
-      product_id: product.id,
-      price: product.price,
-      quantity,
-      image: product.image,
-    });
     navigate("/billing", {
       state: {
-        name: product.name,
-        product_id: product.id,
-        price: product.price,
-        quantity: quantity,
-        image: product.image,
+        items: [
+          {
+            name: product.name,
+            product_id: product.id,
+            price: product.price,
+            quantity,
+            image: product.image,
+            stock: product.stock,
+          },
+        ],
       },
     });
   };
@@ -109,13 +125,21 @@ export default function ProductDetails() {
                 </div>
               </div>
 
-              {/* ADVANCE BOOKING BUTTON */}
-              <button
-                onClick={handleBooking}
-                className="w-full md:w-auto px-12 py-4 border-2 border-green-800 text-green-800 font-bold rounded-xl hover:bg-green-800 hover:text-white transition uppercase tracking-widest text-sm"
-              >
-                Advance Booking
-              </button>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={handleAddToCart}
+                  className="w-full md:w-auto px-10 py-4 bg-green-800 text-white font-bold rounded-xl hover:bg-green-900 transition uppercase tracking-widest text-sm"
+                >
+                  Add to Cart
+                </button>
+
+                <button
+                  onClick={handleBooking}
+                  className="w-full md:w-auto px-10 py-4 border-2 border-green-800 text-green-800 font-bold rounded-xl hover:bg-green-800 hover:text-white transition uppercase tracking-widest text-sm"
+                >
+                  Buy Now
+                </button>
+              </div>
             </div>
           </div>
 

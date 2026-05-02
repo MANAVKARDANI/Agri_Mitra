@@ -1,4 +1,6 @@
 import bcrypt from "bcryptjs";
+import path from "path";
+import fs from "fs";
 import {
   createUser,
   findUserByEmail,
@@ -6,7 +8,16 @@ import {
   listUsers,
   updateUserById,
   findUserById,
+  findUserWithPasswordById,
 } from "../models/userModel.js";
+
+const getImageUrl = (file) => {
+  if (!file) return null;
+  const uploadsIndex = file.destination.indexOf("uploads");
+  if (uploadsIndex === -1) return null;
+  const relativePath = file.destination.substring(uploadsIndex);
+  return `/${relativePath}/${file.filename}`.replace(/\\/g, "/");
+};
 
 export const getUsers = async (_req, res) => {
   try {
@@ -20,7 +31,7 @@ export const getUsers = async (_req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const userId = Number(req.params.id);
-    const { name, email, role, password } = req.body;
+    const { name, email, role, password, currentPassword } = req.body;
     const isAdmin = req.user.role === "admin";
     const isSelf = req.user.id === userId;
 
@@ -36,7 +47,27 @@ export const updateUser = async (req, res) => {
     if (name) payload.name = name;
     if (email) payload.email = email;
     if (role && isAdmin) payload.role = role.toLowerCase() === "admin" ? "admin" : "user";
-    if (password) payload.password = await bcrypt.hash(password, 10);
+    if (password) {
+      if (isSelf) {
+        if (!currentPassword) {
+          return res.status(400).json({ message: "Current password is required" });
+        }
+
+        const existingUser = await findUserWithPasswordById(userId);
+        const isPasswordValid = existingUser
+          ? await bcrypt.compare(currentPassword, existingUser.password)
+          : false;
+
+        if (!isPasswordValid) {
+          return res.status(401).json({ message: "Current password is incorrect" });
+        }
+      }
+
+      payload.password = await bcrypt.hash(password, 10);
+    }
+    if (req.file) {
+      payload.profileImage = getImageUrl(req.file);
+    }
     if (!Object.keys(payload).length) {
       return res.status(400).json({ message: "No valid user fields provided" });
     }
@@ -65,11 +96,13 @@ export const createManagedUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const profileImage = req.file ? getImageUrl(req.file) : null;
     const user = await createUser({
       name,
       email,
       password: hashedPassword,
       role: normalizedRole,
+      profileImage,
     });
 
     return res.status(201).json(user);

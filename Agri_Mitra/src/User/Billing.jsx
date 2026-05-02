@@ -8,23 +8,17 @@ export default function Billing() {
   const [payment, setPayment] = useState("UPI");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [houseNo, setHouseNo] = useState("");
+  const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
+  const [pincode, setPincode] = useState("");
   const { state } = useLocation();
   const navigate = useNavigate();
   const { items, clear } = useCart();
   const { showSuccess, showError } = useToast();
 
-  const single = state
-    ? [
-        {
-          name: state.name,
-          product_id: state.product_id,
-          price: state.price,
-          quantity: state.quantity,
-        },
-      ]
-    : [];
-  const cartItems = items?.length ? items : single;
+  const selectedItems = Array.isArray(state?.items) ? state.items : [];
+  const cartItems = selectedItems.length ? selectedItems : items;
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + Number(item.price) * Number(item.quantity),
@@ -39,24 +33,29 @@ export default function Billing() {
       showError("Your cart is empty.");
       return;
     }
-    if (!fullName.trim() || !phone.trim() || !address.trim()) {
-      showError("Please fill billing details.");
+    if (!fullName.trim() || !phone.trim() || !street.trim() || !city.trim() || !pincode.trim()) {
+      showError("Please fill all billing details.");
       return;
     }
     try {
       await ordersApi.create({
         status: "pending",
         items: cartItems.map((item) => ({
-          product_id: Number(item.product_id || 1),
+          product_id: Number(item.product_id),
           quantity: Number(item.quantity),
-          price: Number(item.price),
         })),
+        address: {
+          house_no: houseNo.trim(),
+          street: street.trim(),
+          city: city.trim(),
+          pincode: pincode.trim(),
+        },
       });
-      clear();
+      await clear(cartItems.map((item) => Number(item.product_id)));
       showSuccess("Order placed successfully.");
       navigate("/profile");
-    } catch {
-      showError("Failed to place order");
+    } catch (error) {
+      showError(error?.response?.data?.message || "Failed to place order");
     }
   };
 
@@ -98,20 +97,55 @@ export default function Billing() {
                 </div>
               </div>
 
-              {/* ADDRESS */}
-              <div>
-                <label className="text-sm text-gray-500">
-                  Shipping Address
-                </label>
+              {/* ADDRESS FIELDS */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-sm text-gray-500">House No</label>
+                  <input
+                    required
+                    type="text"
+                    value={houseNo}
+                    onChange={(e) => setHouseNo(e.target.value)}
+                    placeholder="123"
+                    className="mt-2 w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-700 outline-none"
+                  />
+                </div>
 
-                <textarea
-                  required
-                  rows="3"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Street address, City, State, ZIP"
-                  className="mt-2 w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-700 outline-none"
-                />
+                <div>
+                  <label className="text-sm text-gray-500">Street</label>
+                  <input
+                    required
+                    type="text"
+                    value={street}
+                    onChange={(e) => setStreet(e.target.value)}
+                    placeholder="Main Street"
+                    className="mt-2 w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-700 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-500">City</label>
+                  <input
+                    required
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="Rajkot"
+                    className="mt-2 w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-700 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-500">Pincode</label>
+                  <input
+                    required
+                    type="text"
+                    value={pincode}
+                    onChange={(e) => setPincode(e.target.value)}
+                    placeholder="360005"
+                    className="mt-2 w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-700 outline-none"
+                  />
+                </div>
               </div>
 
               {/* PAYMENT METHOD */}

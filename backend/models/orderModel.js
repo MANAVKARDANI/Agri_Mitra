@@ -6,7 +6,7 @@ const createOrderError = (message, statusCode) => {
   return error;
 };
 
-export const createOrderWithItems = async ({ userId, status, items }) => {
+export const createOrderWithItems = async ({ userId, status, items, address }) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -38,13 +38,14 @@ export const createOrderWithItems = async ({ userId, status, items }) => {
       totalAmount += unitPrice * qty;
     }
 
+    const { house_no, street, city, pincode } = address || {};
     const orderResult = await client.query(
       `
-      INSERT INTO orders (user_id, total_amount, status)
-      VALUES ($1, $2, $3)
+      INSERT INTO orders (user_id, total_amount, status, house_no, street, city, pincode)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
       `,
-      [userId, totalAmount, status || "pending"]
+      [userId, totalAmount, status || "pending", house_no || null, street || null, city || null, pincode || null]
     );
     const order = orderResult.rows[0];
 

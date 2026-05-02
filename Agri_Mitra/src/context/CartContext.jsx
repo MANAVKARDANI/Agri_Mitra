@@ -1,55 +1,81 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { cartApi } from "../services/api";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext(null);
 
-function readCartStorage() {
-  try {
-    const raw = localStorage.getItem("cart");
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    localStorage.removeItem("cart");
-    return [];
-  }
-}
-
-function normalizeItem(item) {
-  return {
-    product_id: Number(item.product_id),
-    name: item.name,
-    price: Number(item.price),
-    quantity: Number(item.quantity),
-    image: item.image || "",
-  };
-}
-
 export function CartProvider({ children }) {
-  const [items, setItems] = useState(readCartStorage);
+  const { isAuthenticated, user } = useAuth();
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const persist = (nextItems) => {
-    setItems(nextItems);
-    localStorage.setItem("cart", JSON.stringify(nextItems));
-  };
-
-  const addItem = (item) => {
-    const next = normalizeItem(item);
-    const existing = items.find((x) => x.product_id === next.product_id);
-    if (existing) {
-      persist(
-        items.map((x) =>
-          x.product_id === next.product_id
-            ? { ...x, quantity: x.quantity + next.quantity }
-            : x
-        )
-      );
-      return;
+  const loadCart = async () => {
+    if (!isAuthenticated) {
+      setItems([]);
+      return [];
     }
-    persist([next, ...items]);
+    setLoading(true);
+    try {
+      const { data } = await cartApi.get();
+      setItems(data);
+      return data;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const clear = () => persist([]);
+  const addItem = async ({ product_id, quantity }) => {
+    const { data } = await cartApi.add({
+      product_id: Number(product_id),
+      quantity: Number(quantity),
+    });
+    setItems(data);
+    return data;
+  };
 
-  const value = { items, addItem, clear };
+  const updateItem = async (productId, quantity) => {
+    const { data } = await cartApi.update(productId, { quantity: Number(quantity) });
+    setItems(data);
+    return data;
+  };
+
+  const removeItem = async (productId) => {
+    const { data } = await cartApi.remove(productId);
+    setItems(data);
+    return data;
+  };
+
+  const clear = async (productIds) => {
+    const payload = Array.isArray(productIds) && productIds.length
+      ? { product_ids: productIds }
+      : {};
+    const { data } = await cartApi.clear(payload);
+    setItems(data);
+    return data;
+  };
+
+  useEffect(() => {
+    loadCart().catch(() => setItems([]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.id]);
+
+  const count = items.reduce((sum, item) => sum + Number(item.quantity), 0);
+  const subtotal = items.reduce(
+    (sum, item) => sum + Number(item.price) * Number(item.quantity),
+    0
+  );
+  const value = {
+    items,
+    count,
+    subtotal,
+    loading,
+    addItem,
+    updateItem,
+    removeItem,
+    clear,
+    loadCart,
+  };
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 

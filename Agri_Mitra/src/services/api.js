@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -24,8 +24,18 @@ export const authApi = {
 export const usersApi = {
   getAll: () => api.get("/users"),
   getMe: () => api.get("/users/me"),
-  create: (payload) => api.post("/users", payload),
+  create: (payload) => {
+    if (payload instanceof FormData) {
+      return api.post("/users", payload, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+    }
+    return api.post("/users", payload);
+  },
   update: (id, payload) => api.put(`/users/${id}`, payload),
+  updateImage: (id, formData) => api.put(`/users/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  }),
   remove: (id) => api.delete(`/users/${id}`),
 };
 
@@ -40,6 +50,14 @@ export const productsApi = {
 export const ordersApi = {
   getAll: () => api.get("/orders"),
   create: (payload) => api.post("/orders", payload),
+};
+
+export const cartApi = {
+  get: () => api.get("/cart"),
+  add: (payload) => api.post("/cart/items", payload),
+  update: (productId, payload) => api.put(`/cart/items/${productId}`, payload),
+  remove: (productId) => api.delete(`/cart/items/${productId}`),
+  clear: (payload = {}) => api.delete("/cart", { data: payload }),
 };
 
 export const suppliersApi = {

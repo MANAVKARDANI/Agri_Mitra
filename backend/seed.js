@@ -21,7 +21,10 @@ async function seed() {
     `
     INSERT INTO users (name, email, password, role)
     VALUES ($1, $2, $3, 'admin')
-    ON CONFLICT (email) DO NOTHING
+    ON CONFLICT (email) DO UPDATE
+    SET name = EXCLUDED.name,
+        password = EXCLUDED.password,
+        role = EXCLUDED.role
     `,
     ["Admin", adminEmail, adminHash]
   );
@@ -30,7 +33,10 @@ async function seed() {
     `
     INSERT INTO users (name, email, password, role)
     VALUES ($1, $2, $3, 'user')
-    ON CONFLICT (email) DO NOTHING
+    ON CONFLICT (email) DO UPDATE
+    SET name = EXCLUDED.name,
+        password = EXCLUDED.password,
+        role = EXCLUDED.role
     `,
     ["User", userEmail, userHash]
   );

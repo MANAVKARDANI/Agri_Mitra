@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, UserPlus, User, ShieldCheck, Shield } from "lucide-react";
 import { usersApi } from "../../services/api";
@@ -7,8 +7,11 @@ import { useToast } from "../../context/ToastContext";
 export default function AddUser() {
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
+  const fileInputRef = useRef(null);
 
   const [showPassword, setShowPassword] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  const [profileImageFile, setProfileImageFile] = useState(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -19,6 +22,18 @@ export default function AddUser() {
   });
 
   const [errors, setErrors] = useState({});
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        showError("Please select a valid image file");
+        return;
+      }
+      setProfileImageFile(file);
+      setProfileImage(URL.createObjectURL(file));
+    }
+  };
 
   // ✅ LIVE VALIDATION
   const validateField = (name, value) => {
@@ -53,12 +68,16 @@ export default function AddUser() {
       return;
     }
     try {
-      await usersApi.create({
-        name: form.name,
-        email: form.email,
-        password: form.password,
-        role: form.role.toLowerCase(),
-      });
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("email", form.email);
+      formData.append("password", form.password);
+      formData.append("role", form.role.toLowerCase());
+      if (profileImageFile) {
+        formData.append("profileImage", profileImageFile);
+      }
+
+      await usersApi.create(formData);
       showSuccess("User created successfully.");
       navigate("/admin/users");
     } catch {
@@ -149,6 +168,40 @@ export default function AddUser() {
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password}</p>
             )}
+          </div>
+
+          {/* PROFILE IMAGE */}
+          <div>
+            <label className="text-sm text-gray-600 font-medium">
+              Profile Image (Optional)
+            </label>
+            <div className="flex items-center gap-3 mt-2">
+              {profileImage ? (
+                <img
+                  src={profileImage}
+                  alt="preview"
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                  <User size={20} className="text-gray-400" />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-sm text-green-700 hover:underline"
+              >
+                {profileImage ? "Change" : "Upload"}
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageSelect}
+              />
+            </div>
           </div>
         </div>
 

@@ -6,11 +6,13 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuth();
+  const { count } = useCart();
 
   // Pages where logout should appear
   const authPages = ["/profile", "/edit-profile"];
@@ -86,6 +88,19 @@ export default function Layout() {
               {/* SEARCH */}
               <Link to="/shop">
                 <button className="hover:text-green-800 transition">🔍</button>
+              </Link>
+
+              <Link
+                to="/cart"
+                className="flex items-center gap-2 text-green-800 font-bold text-sm"
+              >
+                <span className="material-symbols-outlined">shopping_cart</span>
+                Cart
+                {count > 0 && (
+                  <span className="rounded-full bg-yellow-500 px-2 py-0.5 text-xs text-white">
+                    {count}
+                  </span>
+                )}
               </Link>
 
               {/* PROFILE */}

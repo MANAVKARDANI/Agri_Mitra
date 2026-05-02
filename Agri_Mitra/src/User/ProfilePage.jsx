@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../services/api";
 
 export default function Profile() {
   const { user } = useAuth();
   const userName = user?.name || "User";
   const userEmail = user?.email || "user@email.com";
+  const profileImage = user?.profile_image ? `${API_BASE_URL.replace("/api", "")}${user.profile_image}` : null;
+
   return (
     <div className="bg-[#f7f7f7] min-h-screen flex items-center justify-center py-16">
       {/* PROFILE CARD */}
@@ -12,15 +15,17 @@ export default function Profile() {
         {/* PROFILE IMAGE */}
         <div className="flex flex-col items-center mb-8">
           <div className="relative">
-            {/* <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzkYu5I16QjD3rwGS-AR1eV2szNmQx_YnJv26W353TfKEeTAcuLKjf5JlALV7oRbMtUlwwvXm9S928ZXUoFt4aEHZdvMLepmCk0r0vdYRY9Ohp5QwMam0AC5YybXQmYZ2SEUv2kbyo5af42i9BQNh8MSRY43Y894gH02jWmO7OsEAonYmMrKHbVXO4IrEBTcY1YwivoAGnQfT2-E6fYlKqPCOI_oG9Ry9YjKsZguv2ISmwWN25cn4Uz7GRN0oy7hLKji30FaKXxtIq"
-              className="w-24 h-24 rounded-full object-cover"
-            /> */}
-
-            {/* EDIT ICON */}
-            {/* <div className="absolute bottom-0 right-0 bg-green-700 text-white rounded-full w-7 h-7 flex items-center justify-center shadow">
-              <span className="material-symbols-outlined text-sm">edit</span>
-            </div> */}
+            {profileImage ? (
+              <img
+                src={profileImage}
+                alt="profile"
+                className="w-24 h-24 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-green-200 flex items-center justify-center text-green-800 font-bold text-2xl">
+                {userName.charAt(0).toUpperCase()}
+              </div>
+            )}
           </div>
 
           <h2 className="text-xl font-bold text-gray-800 mt-4">

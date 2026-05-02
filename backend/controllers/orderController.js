@@ -2,14 +2,14 @@ import { createOrderWithItems, listOrders } from "../models/orderModel.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const { items, status } = req.body;
+    const { items, status, address } = req.body;
     const userId = req.user.id;
 
     if (!Array.isArray(items) || !items.length) {
       return res.status(400).json({ message: "Order items are required" });
     }
 
-    const order = await createOrderWithItems({ userId, status, items });
+    const order = await createOrderWithItems({ userId, status, items, address });
     return res.status(201).json(order);
   } catch (error) {
     return res

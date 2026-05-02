@@ -9,6 +9,7 @@ import {
 } from "../controllers/userController.js";
 import { authenticate, authorize } from "../middleware/auth.js";
 import { handleValidation } from "../middleware/validate.js";
+import { uploadUserImage, uploadAdminImage } from "../middleware/upload.js";
 
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router.post(
   "/",
   authenticate,
   authorize("admin"),
+  uploadUserImage,
   [
     body("name").trim().notEmpty().withMessage("Name is required"),
     body("email").isEmail().withMessage("Valid email is required"),
@@ -30,11 +32,13 @@ router.post(
 router.put(
   "/:id",
   authenticate,
+  uploadUserImage,
   [
     body("name").optional().trim().notEmpty().withMessage("Name cannot be empty"),
     body("email").optional().isEmail(),
     body("role").optional().isIn(["admin", "user", "Admin", "User"]),
     body("password").optional().isLength({ min: 6 }),
+    body("currentPassword").optional().isLength({ min: 6 }),
     handleValidation,
   ],
   updateUser
