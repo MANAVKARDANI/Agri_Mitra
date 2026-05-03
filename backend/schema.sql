@@ -4,8 +4,24 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(150) UNIQUE NOT NULL,
   password TEXT NOT NULL,
   role VARCHAR(20) NOT NULL DEFAULT 'user' CHECK (role IN ('admin', 'user')),
+  avatar TEXT DEFAULT '',
   reset_token_hash TEXT,
   reset_token_expires_at TIMESTAMP,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS suppliers (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(150) NOT NULL,
+  contact VARCHAR(120) NOT NULL,
+  address TEXT NOT NULL,
+  image TEXT DEFAULT '',
+  area_type VARCHAR(30) NOT NULL DEFAULT 'city',
+  state VARCHAR(80) DEFAULT '',
+  district VARCHAR(80) DEFAULT '',
+  city VARCHAR(80) DEFAULT '',
+  village VARCHAR(120) DEFAULT '',
+  business_hours VARCHAR(80) DEFAULT '',
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
@@ -16,6 +32,7 @@ CREATE TABLE IF NOT EXISTS products (
   price NUMERIC(12, 2) NOT NULL CHECK (price >= 0),
   image TEXT DEFAULT '',
   stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
+  supplier_id INTEGER REFERENCES suppliers(id) ON DELETE SET NULL,
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
@@ -33,22 +50,4 @@ CREATE TABLE IF NOT EXISTS order_items (
   product_id INTEGER NOT NULL REFERENCES products(id),
   quantity INTEGER NOT NULL CHECK (quantity > 0),
   price NUMERIC(12, 2) NOT NULL CHECK (price >= 0)
-);
-
-CREATE TABLE IF NOT EXISTS cart_items (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-  quantity INTEGER NOT NULL CHECK (quantity > 0),
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  UNIQUE (user_id, product_id)
-);
-
-CREATE TABLE IF NOT EXISTS suppliers (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(150) NOT NULL,
-  contact VARCHAR(120) NOT NULL,
-  address TEXT NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

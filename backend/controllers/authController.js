@@ -17,7 +17,8 @@ const signToken = (user) =>
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role = "user" } = req.body;
+    const normalizedRole = role.toLowerCase() === "admin" ? "admin" : "user";
 
     const exists = await findUserByEmail(email);
     if (exists) {
@@ -29,15 +30,22 @@ export const register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: "user",
+      role: normalizedRole,
     });
 
     const token = signToken(user);
-    return res.status(201).json({ token, user });
+    return res.status(201).json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar || "",
+        created_at: user.created_at,
+      },
+    });
   } catch (error) {
-    if (error.code === "23505") {
-      return res.status(409).json({ message: "Email already registered" });
-    }
     return res.status(500).json({ message: "Registration failed", error: error.message });
   }
 };
@@ -61,6 +69,7 @@ export const login = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      avatar: user.avatar || "",
       created_at: user.created_at,
     };
 
@@ -90,7 +99,7 @@ export const forgotPassword = async (req, res) => {
       expiresAt,
     });
 
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5174";
     const resetLink = `${frontendUrl}/forgot-password?token=${rawToken}`;
 
     const transporter = await getTransporter();
@@ -107,16 +116,10 @@ export const forgotPassword = async (req, res) => {
       `,
     });
 
-    const isProduction = process.env.NODE_ENV === "production";
-
     return res.json({
       message: "If this email exists, a reset link has been sent.",
-      ...(isProduction
-        ? {}
-        : {
-            preview: info.message?.toString() || null,
-            resetLink,
-          }),
+      preview: info.message?.toString() || null,
+      resetLink,
     });
   } catch (error) {
     return res.status(500).json({ message: "Failed to send reset email", error: error.message });

@@ -1,52 +1,38 @@
-import multer from "multer";
-import path from "path";
 import fs from "fs";
+import path from "path";
 import { fileURLToPath } from "url";
+import multer from "multer";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const uploadsRoot = path.join(__dirname, "..", "..", "uploads");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const uploadDir = path.join(__dirname, "..", "uploads");
 
-const createStorage = (subdir) => {
-  return multer.diskStorage({
-    destination: (req, file, cb) => {
-      const username = req.user?.name || req.body.name || "unknown";
-      const usernameSafe = username.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
-      const dest = path.join(uploadsRoot, subdir, usernameSafe);
-      fs.mkdirSync(dest, { recursive: true });
-      cb(null, dest);
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      const ext = path.extname(file.originalname);
-      cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
-    },
-  });
-};
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif|webp/;
-  const ext = path.extname(file.originalname).toLowerCase();
-  if (allowedTypes.test(ext)) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only image files are allowed"), false);
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname || "") || ".jpg";
+    const uid = req.user?.id != null ? `user-${req.user.id}-` : "";
+    const base = path
+      .basename(file.originalname || "photo", ext)
+      .replace(/[^a-zA-Z0-9-_]/g, "")
+      .slice(0, 40) || "photo";
+    cb(null, `${uid}${base}-${Date.now()}${ext}`);
+  },
+});
+
+const imageFilter = (_req, file, cb) => {
+  if (!file.mimetype || !file.mimetype.startsWith("image/")) {
+    cb(new Error("Only image uploads are allowed"));
+    return;
   }
+  cb(null, true);
 };
 
-export const uploadUserImage = multer({
-  storage: createStorage("users"),
-  fileFilter,
+export const uploadImage = multer({
+  storage,
+  fileFilter: imageFilter,
   limits: { fileSize: 5 * 1024 * 1024 },
-}).single("profileImage");
-
-export const uploadAdminImage = multer({
-  storage: createStorage("admin"),
-  fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 },
-}).single("profileImage");
-
-export const getPublicPath = (file) => {
-  if (!file) return null;
-  return `/uploads/${file.destination.split("uploads")[1]}/${file.filename}`;
-};
+});

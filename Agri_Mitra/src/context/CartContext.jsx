@@ -1,81 +1,76 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useState } from "react";
-import { cartApi } from "../services/api";
-import { useAuth } from "./AuthContext";
+import { createContext, useContext, useState } from "react";
 
 const CartContext = createContext(null);
 
+function normalizeItem(item) {
+  const stock =
+    item.stock != null && item.stock !== "" ? Number(item.stock) : null;
+  return {
+    product_id: Number(item.product_id),
+    name: item.name,
+    price: Number(item.price),
+    quantity: Number(item.quantity),
+    image: item.image || "",
+    stock: Number.isFinite(stock) ? stock : null,
+  };
+}
+
 export function CartProvider({ children }) {
-  const { isAuthenticated, user } = useAuth();
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [items, setItems] = useState(() => {
+    const raw = localStorage.getItem("cart");
+    return raw ? JSON.parse(raw) : [];
+  });
 
-  const loadCart = async () => {
-    if (!isAuthenticated) {
-      setItems([]);
-      return [];
+  const persist = (nextItems) => {
+    setItems(nextItems);
+    localStorage.setItem("cart", JSON.stringify(nextItems));
+  };
+
+  const addItem = (item) => {
+    const next = normalizeItem(item);
+    const max = next.stock != null && Number.isFinite(next.stock) ? next.stock : Infinity;
+    const existing = items.find((x) => x.product_id === next.product_id);
+    if (existing) {
+      const cap = (q) =>
+        max === Infinity ? q : Math.min(max, q);
+      persist(
+        items.map((x) =>
+          x.product_id === next.product_id
+            ? {
+                ...x,
+                quantity: cap(x.quantity + next.quantity),
+                stock: next.stock ?? x.stock,
+              }
+            : x
+        )
+      );
+      return;
     }
-    setLoading(true);
-    try {
-      const { data } = await cartApi.get();
-      setItems(data);
-      return data;
-    } finally {
-      setLoading(false);
-    }
+    const initialQty = max === Infinity ? next.quantity : Math.min(max, next.quantity);
+    persist([{ ...next, quantity: initialQty }, ...items]);
   };
 
-  const addItem = async ({ product_id, quantity }) => {
-    const { data } = await cartApi.add({
-      product_id: Number(product_id),
-      quantity: Number(quantity),
-    });
-    setItems(data);
-    return data;
+  const clear = () => persist([]);
+
+  const removeItem = (productId) => {
+    const id = Number(productId);
+    persist(items.filter((x) => x.product_id !== id));
   };
 
-  const updateItem = async (productId, quantity) => {
-    const { data } = await cartApi.update(productId, { quantity: Number(quantity) });
-    setItems(data);
-    return data;
+  const setQuantity = (productId, quantity) => {
+    const id = Number(productId);
+    const row = items.find((x) => x.product_id === id);
+    if (!row) return;
+    const max =
+      row.stock != null && Number.isFinite(Number(row.stock))
+        ? Number(row.stock)
+        : 999999;
+    const q = Math.min(max, Math.max(1, Number(quantity) || 1));
+    persist(items.map((x) => (x.product_id === id ? { ...x, quantity: q } : x)));
   };
 
-  const removeItem = async (productId) => {
-    const { data } = await cartApi.remove(productId);
-    setItems(data);
-    return data;
-  };
-
-  const clear = async (productIds) => {
-    const payload = Array.isArray(productIds) && productIds.length
-      ? { product_ids: productIds }
-      : {};
-    const { data } = await cartApi.clear(payload);
-    setItems(data);
-    return data;
-  };
-
-  useEffect(() => {
-    loadCart().catch(() => setItems([]));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user?.id]);
-
-  const count = items.reduce((sum, item) => sum + Number(item.quantity), 0);
-  const subtotal = items.reduce(
-    (sum, item) => sum + Number(item.price) * Number(item.quantity),
-    0
-  );
-  const value = {
-    items,
-    count,
-    subtotal,
-    loading,
-    addItem,
-    updateItem,
-    removeItem,
-    clear,
-    loadCart,
-  };
+  const value = { items, addItem, clear, removeItem, setQuantity };
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
@@ -84,3 +79,4 @@ export function useCart() {
   if (!ctx) throw new Error("useCart must be used inside CartProvider");
   return ctx;
 }
+

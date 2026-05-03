@@ -22,24 +22,14 @@ router.post(
     body("name").trim().notEmpty(),
     body("price").isFloat({ min: 0 }),
     body("stock").isInt({ min: 0 }),
+    body("description").optional().isString(),
+    body("image").optional().isString(),
+    body("supplier_id").optional().isInt(),
     handleValidation,
   ],
   addProduct
 );
-router.put(
-  "/:id",
-  authenticate,
-  authorize("admin"),
-  [
-    body("name").optional().trim().notEmpty(),
-    body("description").optional().isString(),
-    body("image").optional().isString(),
-    body("price").optional().isFloat({ min: 0 }),
-    body("stock").optional().isInt({ min: 0 }),
-    handleValidation,
-  ],
-  editProduct
-);
+router.put("/:id", authenticate, authorize("admin"), editProduct);
 router.delete("/:id", authenticate, authorize("admin"), removeProduct);
 
 export default router;

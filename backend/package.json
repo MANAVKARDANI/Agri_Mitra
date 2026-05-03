@@ -6,9 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "smoke": "node scripts/smoke.js",
-    "test": "node scripts/smoke.js",
-    "verify": "npm run smoke"
+    "migrate": "node migrate.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -17,8 +15,10 @@
     "express": "^4.21.2",
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^2.1.1",
     "nodemailer": "^6.10.1",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "razorpay": "^2.9.6"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

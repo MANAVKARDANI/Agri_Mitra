@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { suppliersApi } from "../services/api";
+import { resolveMediaUrl } from "../utils/assetUrl";
 
 import HeroShop from "../assets/Hero_shop.png";
 
@@ -16,39 +17,88 @@ import Root from "../assets/Root & Shoot Suppliers.png";
 const localImages = [FarmaFer, Valley, EcoCrop, Growers, Nature, Modern, Plant, Root];
 
 export default function Shop() {
-  const [shops, setShops] = useState([]);
-
+  const [rawShops, setRawShops] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [stateFilter, setStateFilter] = useState("");
+  const [districtFilter, setDistrictFilter] = useState("");
+  const [villageFilter, setVillageFilter] = useState("");
   const shopsPerPage = 8;
 
   useEffect(() => {
     const loadShops = async () => {
       try {
         const { data } = await suppliersApi.getAll();
-        const mapped = data.map((shop, index) => ({
-          id: shop.id,
-          name: shop.name,
-          img: localImages[index % localImages.length],
-          address: shop.address,
-          verified: true,
-        }));
-        setShops(mapped);
+        setRawShops(Array.isArray(data) ? data : []);
       } catch {
-        setShops([]);
+        setRawShops([]);
       }
     };
     loadShops();
   }, []);
 
-  const indexOfLastShop = currentPage * shopsPerPage;
-  const indexOfFirstShop = indexOfLastShop - shopsPerPage;
+  const shops = useMemo(() => {
+    return rawShops.map((shop, index) => {
+      const fromApi = resolveMediaUrl(shop.image);
+      return {
+        ...shop,
+        img: fromApi || localImages[index % localImages.length],
+        state: shop.state || "",
+        district: shop.district || "",
+        city: shop.city || "",
+        village: shop.village || "",
+        business_hours: shop.business_hours || "",
+      };
+    });
+  }, [rawShops]);
 
-  const currentShops = shops.slice(indexOfFirstShop, indexOfLastShop);
-  const totalPages = Math.ceil(shops.length / shopsPerPage);
+  const states = useMemo(() => {
+    const s = new Set();
+    shops.forEach((sh) => {
+      if (sh.state) s.add(sh.state);
+    });
+    return Array.from(s).sort();
+  }, [shops]);
+
+  const districts = useMemo(() => {
+    const d = new Set();
+    shops.forEach((sh) => {
+      if (sh.district && (!stateFilter || sh.state === stateFilter)) d.add(sh.district);
+    });
+    return Array.from(d).sort();
+  }, [shops, stateFilter]);
+
+  const villages = useMemo(() => {
+    const v = new Set();
+    shops.forEach((sh) => {
+      if (!sh.village) return;
+      if (stateFilter && sh.state !== stateFilter) return;
+      if (districtFilter && sh.district !== districtFilter) return;
+      v.add(sh.village);
+    });
+    return Array.from(v).sort();
+  }, [shops, stateFilter, districtFilter]);
+
+  const filteredShops = useMemo(() => {
+    return shops.filter((sh) => {
+      if (stateFilter && sh.state !== stateFilter) return false;
+      if (districtFilter && sh.district !== districtFilter) return false;
+      if (villageFilter && sh.village !== villageFilter) return false;
+      return true;
+    });
+  }, [shops, stateFilter, districtFilter, villageFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredShops.length / shopsPerPage));
+  const page = Math.min(currentPage, totalPages);
+  const indexOfLastShop = page * shopsPerPage;
+  const indexOfFirstShop = indexOfLastShop - shopsPerPage;
+  const currentShops = filteredShops.slice(indexOfFirstShop, indexOfLastShop);
+
+  const handleSearch = () => {
+    setCurrentPage(1);
+  };
 
   return (
     <div className="bg-white text-gray-800">
-      {/* HERO */}
       <section className="relative">
         <div
           className="h-[350px] bg-cover bg-center"
@@ -56,17 +106,15 @@ export default function Shop() {
         >
           <div className="absolute inset-0 bg-black/40"></div>
 
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
             <h1 className="text-5xl font-extrabold">Explore Shops</h1>
             <p className="mt-2 text-lg text-white/90">
-              Find premium stockists near you
+              Find suppliers by state, district, and village
             </p>
           </div>
         </div>
       </section>
 
-      {/* ================= SEARCH BOX (ADDED ONLY) ================= */}
-      {/* ================= SEARCH BOX (FIXED BG) ================= */}
       <div className="relative -mt-24 z-10 flex justify-center px-6">
         <div
           className="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)]
@@ -77,59 +125,81 @@ export default function Shop() {
           </h2>
 
           <div className="grid md:grid-cols-3 gap-5 mb-6">
-            {/* STATE */}
             <select
+              value={stateFilter}
+              onChange={(e) => {
+                setStateFilter(e.target.value);
+                setDistrictFilter("");
+                setVillageFilter("");
+              }}
               className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm
         hover:bg-white hover:border-green-400 hover:shadow-sm
         focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
             >
-              <option>Select State</option>
-              <option>Gujarat</option>
-              <option>Maharashtra</option>
-              <option>Rajasthan</option>
-              <option>Karnataka</option>
+              <option value="">All states</option>
+              {states.map((st) => (
+                <option key={st} value={st}>
+                  {st}
+                </option>
+              ))}
             </select>
 
-            {/* DISTRICT */}
             <select
+              value={districtFilter}
+              onChange={(e) => {
+                setDistrictFilter(e.target.value);
+                setVillageFilter("");
+              }}
               className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm
         hover:bg-white hover:border-green-400 hover:shadow-sm
         focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
             >
-              <option>Select District</option>
-              <option>Ahmedabad</option>
-              <option>Surat</option>
-              <option>Rajkot</option>
-              <option>Pune</option>
+              <option value="">All districts</option>
+              {districts.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
             </select>
 
-            {/* SHOP */}
             <select
+              value={villageFilter}
+              onChange={(e) => setVillageFilter(e.target.value)}
               className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm
         hover:bg-white hover:border-green-400 hover:shadow-sm
         focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
             >
-              <option>Select City or Shop</option>
-              <option>Farma Fer</option>
-              <option>EcoCrop Solutions</option>
+              <option value="">All villages</option>
+              {villages.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
             </select>
           </div>
 
-          {/* BUTTON */}
           <div className="flex justify-center">
             <button
+              type="button"
+              onClick={handleSearch}
               className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-xl text-sm font-semibold
         shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300"
             >
-               SEARCH
+              SEARCH
             </button>
           </div>
         </div>
       </div>
 
-      {/* SHOP GRID */}
       <section className="py-16 bg-[#F5F5F3]">
         <div className="max-w-7xl mx-auto px-6">
+          <p className="text-sm text-gray-500 mb-6">
+            Showing {filteredShops.length} shop{filteredShops.length === 1 ? "" : "s"}
+            {stateFilter ? ` · ${stateFilter}` : ""}
+            {districtFilter ? ` · ${districtFilter}` : ""}
+            {villageFilter ? ` · ${villageFilter}` : ""}
+          </p>
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {currentShops.map((shop) => (
               <div
@@ -152,11 +222,9 @@ export default function Shop() {
                     className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-700"
                   />
 
-                  {shop.verified && (
-                    <div className="absolute top-3 right-3 bg-white text-green-700 text-xs px-3 py-1 rounded-full shadow-md">
-                      Verified
-                    </div>
-                  )}
+                  <div className="absolute top-3 right-3 bg-white text-green-700 text-xs px-3 py-1 rounded-full shadow-md">
+                    Verified
+                  </div>
                 </div>
 
                 <div className="mt-4 relative z-10">
@@ -164,7 +232,12 @@ export default function Shop() {
                     {shop.name}
                   </h3>
 
-                  <p className="text-sm text-gray-500 mt-1">{shop.address}</p>
+                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">{shop.address}</p>
+                  {(shop.state || shop.district || shop.village) && (
+                    <p className="text-xs text-gray-400 mt-1">
+                      {[shop.village, shop.district, shop.state].filter(Boolean).join(" · ")}
+                    </p>
+                  )}
 
                   <Link
                     to="/shop-details"
@@ -182,14 +255,18 @@ export default function Shop() {
             ))}
           </div>
 
-          {/* PAGINATION */}
-          <div className="flex justify-center mt-12 gap-3">
+          {filteredShops.length === 0 && (
+            <p className="text-center text-gray-500 py-16">No shops match these filters.</p>
+          )}
+
+          <div className="flex justify-center mt-12 gap-3 flex-wrap">
             {[...Array(totalPages)].map((_, i) => (
               <button
                 key={i}
+                type="button"
                 onClick={() => setCurrentPage(i + 1)}
                 className={`px-4 py-2 rounded-md transition ${
-                  currentPage === i + 1
+                  page === i + 1
                     ? "bg-green-700 text-white"
                     : "bg-white border hover:bg-gray-100"
                 }`}

@@ -7,12 +7,14 @@ import {
 } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import { resolveMediaUrl } from "../utils/assetUrl";
 
 export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
-  const { count } = useCart();
+  const { logout, user } = useAuth();
+  const { items } = useCart();
+  const cartCount = items.reduce((n, it) => n + Number(it.quantity || 0), 0);
 
   // Pages where logout should appear
   const authPages = ["/profile", "/edit-profile"];
@@ -87,31 +89,50 @@ export default function Layout() {
             <div className="flex items-center gap-6 text-gray-600">
               {/* SEARCH */}
               <Link to="/shop">
-                <button className="hover:text-green-800 transition">🔍</button>
+                <button type="button" className="hover:text-green-800 transition">
+                  🔍
+                </button>
               </Link>
 
-              <Link
+              <NavLink
                 to="/cart"
-                className="flex items-center gap-2 text-green-800 font-bold text-sm"
+                className={({ isActive }) =>
+                  `relative flex items-center gap-1 text-sm font-semibold ${
+                    isActive ? "text-green-800" : "text-gray-600 hover:text-green-800"
+                  }`
+                }
               >
-                <span className="material-symbols-outlined">shopping_cart</span>
+                <span className="material-symbols-outlined text-[22px]">shopping_cart</span>
                 Cart
-                {count > 0 && (
-                  <span className="rounded-full bg-yellow-500 px-2 py-0.5 text-xs text-white">
-                    {count}
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-3 min-w-[1.25rem] h-5 px-1 rounded-full bg-yellow-500 text-white text-[10px] font-bold flex items-center justify-center">
+                    {cartCount > 99 ? "99+" : cartCount}
                   </span>
                 )}
-              </Link>
+              </NavLink>
 
               {/* PROFILE */}
               <Link
                 to="/profile"
                 className="flex items-center gap-2 text-green-800 font-bold text-sm"
               >
-                <span className="material-symbols-outlined">
-                  account_circle
-                </span>
-                My Account
+                {resolveMediaUrl(user?.avatar) ? (
+                  <img
+                    src={resolveMediaUrl(user.avatar)}
+                    alt=""
+                    className="w-8 h-8 rounded-full object-cover border border-green-200"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-green-200 text-green-800 flex items-center justify-center text-[10px] font-bold">
+                    {(user?.name || "U")
+                      .split(" ")
+                      .map((p) => p[0])
+                      .join("")
+                      .slice(0, 2)
+                      .toUpperCase()}
+                  </div>
+                )}
+                <span className="hidden sm:inline">My Account</span>
               </Link>
 
               {/* LOGOUT BUTTON */}

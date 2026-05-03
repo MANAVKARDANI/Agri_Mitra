@@ -27,13 +27,21 @@ export const getProductById = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    const { name, description = "", price, image = "", stock } = req.body;
+    const {
+      name,
+      description = "",
+      price,
+      image = "",
+      stock,
+      supplier_id,
+    } = req.body;
     const product = await createProduct({
       name,
       description,
       price: Number(price),
       image,
       stock: Number(stock),
+      supplier_id: supplier_id != null && supplier_id !== "" ? Number(supplier_id) : null,
     });
     return res.status(201).json(product);
   } catch (error) {
@@ -43,14 +51,14 @@ export const addProduct = async (req, res) => {
 
 export const editProduct = async (req, res) => {
   try {
-    const payload = {};
-    if (req.body.name !== undefined) payload.name = req.body.name;
-    if (req.body.description !== undefined) payload.description = req.body.description;
-    if (req.body.image !== undefined) payload.image = req.body.image;
-    if (req.body.price !== undefined) payload.price = Number(req.body.price);
-    if (req.body.stock !== undefined) payload.stock = Number(req.body.stock);
-    if (!Object.keys(payload).length) {
-      return res.status(400).json({ message: "No valid product fields provided" });
+    const payload = { ...req.body };
+    if (payload.price !== undefined) payload.price = Number(payload.price);
+    if (payload.stock !== undefined) payload.stock = Number(payload.stock);
+    if (payload.supplier_id !== undefined) {
+      payload.supplier_id =
+        payload.supplier_id != null && payload.supplier_id !== ""
+          ? Number(payload.supplier_id)
+          : null;
     }
     const product = await updateProductById(Number(req.params.id), payload);
     if (!product) return res.status(404).json({ message: "Product not found" });

@@ -16,8 +16,30 @@ export const getSuppliers = async (_req, res) => {
 
 export const addSupplier = async (req, res) => {
   try {
-    const { name, contact, address } = req.body;
-    const supplier = await createSupplier({ name, contact, address });
+    const {
+      name,
+      contact,
+      address,
+      image = "",
+      area_type = "city",
+      state = "",
+      district = "",
+      city = "",
+      village = "",
+      business_hours = "",
+    } = req.body;
+    const supplier = await createSupplier({
+      name,
+      contact,
+      address,
+      image,
+      area_type,
+      state,
+      district,
+      city,
+      village,
+      business_hours,
+    });
     return res.status(201).json(supplier);
   } catch (error) {
     return res.status(500).json({ message: "Failed to create supplier", error: error.message });
@@ -26,14 +48,7 @@ export const addSupplier = async (req, res) => {
 
 export const editSupplier = async (req, res) => {
   try {
-    const payload = {};
-    if (req.body.name !== undefined) payload.name = req.body.name;
-    if (req.body.contact !== undefined) payload.contact = req.body.contact;
-    if (req.body.address !== undefined) payload.address = req.body.address;
-    if (!Object.keys(payload).length) {
-      return res.status(400).json({ message: "No valid supplier fields provided" });
-    }
-    const supplier = await updateSupplierById(Number(req.params.id), payload);
+    const supplier = await updateSupplierById(Number(req.params.id), req.body);
     if (!supplier) return res.status(404).json({ message: "Supplier not found" });
     return res.json(supplier);
   } catch (error) {

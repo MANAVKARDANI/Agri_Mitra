@@ -4,18 +4,11 @@ import { authApi, usersApi } from "../services/api";
 
 const AuthContext = createContext(null);
 
-function readJsonStorage(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
-  } catch {
-    localStorage.removeItem(key);
-    return fallback;
-  }
-}
-
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => readJsonStorage("user", null));
+  const [user, setUser] = useState(() => {
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw) : null;
+  });
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [loading, setLoading] = useState(false);
 
@@ -58,9 +51,12 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  const updateStoredUser = (nextUser) => {
-    localStorage.setItem("user", JSON.stringify(nextUser));
-    setUser(nextUser);
+  const refreshUser = async () => {
+    if (!token) return null;
+    const { data } = await usersApi.getMe();
+    setUser(data);
+    localStorage.setItem("user", JSON.stringify(data));
+    return data;
   };
 
   useEffect(() => {
@@ -68,7 +64,8 @@ export function AuthProvider({ children }) {
       if (!token || user) return;
       try {
         const { data } = await usersApi.getMe();
-        updateStoredUser(data);
+        setUser(data);
+        localStorage.setItem("user", JSON.stringify(data));
       } catch {
         logout();
       }
@@ -85,7 +82,7 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
-    updateStoredUser,
+    refreshUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

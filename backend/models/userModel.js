@@ -1,12 +1,14 @@
 import pool from "../config/db.js";
 
-export const createUser = async ({ name, email, password, role, profileImage }) => {
+const USER_PUBLIC_FIELDS = "id, name, email, role, avatar, created_at";
+
+export const createUser = async ({ name, email, password, role, avatar = "" }) => {
   const query = `
-    INSERT INTO users (name, email, password, role, profile_image)
+    INSERT INTO users (name, email, password, role, avatar)
     VALUES ($1, $2, $3, $4, $5)
-    RETURNING id, name, email, role, profile_image, created_at
+    RETURNING ${USER_PUBLIC_FIELDS}
   `;
-  const { rows } = await pool.query(query, [name, email, password, role, profileImage || null]);
+  const { rows } = await pool.query(query, [name, email, password, role, avatar]);
   return rows[0];
 };
 
@@ -19,7 +21,7 @@ export const findUserByEmail = async (email) => {
 
 export const findUserById = async (id) => {
   const { rows } = await pool.query(
-    "SELECT id, name, email, role, profile_image, created_at FROM users WHERE id = $1",
+    `SELECT ${USER_PUBLIC_FIELDS} FROM users WHERE id = $1`,
     [id]
   );
   return rows[0];
@@ -32,22 +34,20 @@ export const findUserWithPasswordById = async (id) => {
 
 export const listUsers = async () => {
   const { rows } = await pool.query(
-    "SELECT id, name, email, role, created_at FROM users ORDER BY id DESC"
+    `SELECT ${USER_PUBLIC_FIELDS} FROM users ORDER BY id DESC`
   );
   return rows;
 };
 
 export const updateUserById = async (id, payload) => {
+  const allowed = new Set(["name", "email", "role", "password", "avatar"]);
   const fields = [];
   const values = [];
   let index = 1;
 
   for (const [key, value] of Object.entries(payload)) {
-    if (key === "profileImage") {
-      fields.push(`profile_image = $${index}`);
-    } else {
-      fields.push(`${key} = $${index}`);
-    }
+    if (!allowed.has(key)) continue;
+    fields.push(`${key} = $${index}`);
     values.push(value);
     index += 1;
   }
@@ -59,7 +59,7 @@ export const updateUserById = async (id, payload) => {
     UPDATE users
     SET ${fields.join(", ")}
     WHERE id = $${index}
-    RETURNING id, name, email, role, profile_image, created_at
+    RETURNING ${USER_PUBLIC_FIELDS}
   `;
   const { rows } = await pool.query(query, values);
   return rows[0];

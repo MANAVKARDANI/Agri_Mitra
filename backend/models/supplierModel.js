@@ -5,24 +5,50 @@ export const listSuppliers = async () => {
   return rows;
 };
 
-export const createSupplier = async ({ name, contact, address }) => {
+export const createSupplier = async ({
+  name,
+  contact,
+  address,
+  image = "",
+  area_type = "city",
+  state = "",
+  district = "",
+  city = "",
+  village = "",
+  business_hours = "",
+}) => {
   const { rows } = await pool.query(
     `
-      INSERT INTO suppliers (name, contact, address)
-      VALUES ($1, $2, $3)
+      INSERT INTO suppliers (
+        name, contact, address, image, area_type, state, district, city, village, business_hours
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *
     `,
-    [name, contact, address]
+    [name, contact, address, image, area_type, state, district, city, village, business_hours]
   );
   return rows[0];
 };
 
 export const updateSupplierById = async (id, payload) => {
+  const allowed = new Set([
+    "name",
+    "contact",
+    "address",
+    "image",
+    "area_type",
+    "state",
+    "district",
+    "city",
+    "village",
+    "business_hours",
+  ]);
   const fields = [];
   const values = [];
   let index = 1;
 
   for (const [key, value] of Object.entries(payload)) {
+    if (!allowed.has(key)) continue;
     fields.push(`${key} = $${index}`);
     values.push(value);
     index += 1;

@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import RegisterImage from "./assets/register.png";
 import { useAuth } from "./context/AuthContext";
 import { useToast } from "./context/ToastContext";
 
 
 export default function Register() {
-  const navigate = useNavigate();
   const { register, loading } = useAuth();
   const { showSuccess, showError } = useToast();
 
@@ -48,8 +47,7 @@ export default function Register() {
         password: formData.password,
         role: "user",
       });
-      showSuccess("Account created successfully.");
-      navigate("/home");
+      showSuccess("Register successful. Please login.");
     } catch (error) {
       showError(error?.response?.data?.message || "Registration failed");
     }

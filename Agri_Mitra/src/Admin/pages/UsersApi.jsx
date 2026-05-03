@@ -5,21 +5,27 @@ import {
   ShieldCheck,
   User,
   Shield,
+  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { usersApi } from "../../services/api";
 import { useToast } from "../../context/ToastContext";
+import { resolveMediaUrl } from "../../utils/assetUrl";
+
+const emptyForm = { name: "", email: "", role: "user", newPassword: "" };
 
 export default function UsersApi() {
   const navigate = useNavigate();
-  const { showError } = useToast();
+  const { showError, showSuccess } = useToast();
   const [users, setUsers] = useState([]);
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState(emptyForm);
 
   const loadUsers = async () => {
     try {
       const { data } = await usersApi.getAll();
-      setUsers(data);
+      setUsers(Array.isArray(data) ? data : []);
     } catch {
       setUsers([]);
     }
@@ -36,6 +42,45 @@ export default function UsersApi() {
   );
   const userCount = users.length - adminCount;
 
+  const openEdit = (user) => {
+    setEditing(user);
+    setForm({
+      name: user.name || "",
+      email: user.email || "",
+      role: user.role || "user",
+      newPassword: "",
+    });
+  };
+
+  const closeEdit = () => {
+    setEditing(null);
+    setForm(emptyForm);
+  };
+
+  const saveEdit = async () => {
+    if (!editing?.id) return;
+    if (!form.name?.trim() || !form.email?.trim()) {
+      showError("Name and email are required.");
+      return;
+    }
+    try {
+      const payload = {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        role: form.role,
+      };
+      if (form.newPassword?.trim().length >= 6) {
+        payload.password = form.newPassword.trim();
+      }
+      await usersApi.update(editing.id, payload);
+      showSuccess("User updated.");
+      closeEdit();
+      loadUsers();
+    } catch (err) {
+      showError(err?.response?.data?.message || "Failed to update user");
+    }
+  };
+
   const handleDelete = async (id) => {
     try {
       await usersApi.remove(id);
@@ -47,14 +92,15 @@ export default function UsersApi() {
 
   return (
     <div className="p-6 space-y-8 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
           <p className="text-sm text-gray-500">
-            Control access levels and manage your agricultural workforce.
+            Edit users from the pencil icon. Admins can reset another user&apos;s password below.
           </p>
         </div>
         <button
+          type="button"
           onClick={() => navigate("/admin/add-user")}
           className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm"
         >
@@ -78,19 +124,31 @@ export default function UsersApi() {
             {users.map((user) => (
               <tr key={user.id} className="border-t hover:bg-gray-50">
                 <td className="p-4 text-gray-500">{String(user.id).padStart(3, "0")}</td>
-                <td className="flex items-center gap-3 p-4">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${
-                      user.role === "admin" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"
-                    }`}
-                  >
-                    {user.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()}
+                <td className="p-4">
+                  <div className="flex items-center gap-3">
+                    {user.avatar ? (
+                      <img
+                        src={resolveMediaUrl(user.avatar)}
+                        alt=""
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${
+                          user.role === "admin"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-blue-100 text-blue-700"
+                        }`}
+                      >
+                        {user.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()}
+                      </div>
+                    )}
+                    {user.name}
                   </div>
-                  {user.name}
                 </td>
                 <td className="text-gray-600">{user.email}</td>
                 <td>
@@ -104,13 +162,25 @@ export default function UsersApi() {
                     </span>
                   )}
                 </td>
-                <td className="flex gap-3 text-gray-500">
-                  <button className="hover:text-blue-600">
-                    <Pencil size={16} />
-                  </button>
-                  <button className="hover:text-red-600" onClick={() => handleDelete(user.id)}>
-                    <Trash2 size={16} />
-                  </button>
+                <td className="p-4">
+                  <div className="flex gap-3 text-gray-500">
+                    <button
+                      type="button"
+                      className="hover:text-blue-600"
+                      onClick={() => openEdit(user)}
+                      aria-label="Edit user"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      className="hover:text-red-600"
+                      onClick={() => handleDelete(user.id)}
+                      aria-label="Delete user"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -118,7 +188,6 @@ export default function UsersApi() {
         </table>
         <div className="flex justify-between items-center p-4 text-sm text-gray-500">
           Showing {users.length} active users in the system.
-          <div className="flex gap-2 items-center">Page 1 of 1</div>
         </div>
       </div>
 
@@ -151,6 +220,68 @@ export default function UsersApi() {
           </div>
         </div>
       </div>
+
+      {editing && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 relative">
+            <button
+              type="button"
+              onClick={closeEdit}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700"
+              aria-label="Close"
+            >
+              <X size={22} />
+            </button>
+            <h2 className="text-lg font-bold text-gray-800 mb-4">Edit user</h2>
+            <div className="space-y-3 text-sm">
+              <input
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="w-full border rounded-lg px-3 py-2"
+                placeholder="Name"
+              />
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="w-full border rounded-lg px-3 py-2"
+                placeholder="Email"
+              />
+              <select
+                value={form.role}
+                onChange={(e) => setForm({ ...form, role: e.target.value })}
+                className="w-full border rounded-lg px-3 py-2"
+              >
+                <option value="user">user</option>
+                <option value="admin">admin</option>
+              </select>
+              <input
+                type="password"
+                value={form.newPassword}
+                onChange={(e) => setForm({ ...form, newPassword: e.target.value })}
+                className="w-full border rounded-lg px-3 py-2"
+                placeholder="New password (optional, min 6 chars)"
+              />
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                type="button"
+                onClick={closeEdit}
+                className="px-4 py-2 border rounded-lg text-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={saveEdit}
+                className="px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

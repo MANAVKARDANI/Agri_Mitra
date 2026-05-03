@@ -1,24 +1,14 @@
 import express from "express";
-import { body } from "express-validator";
-import { createOrder, getOrders } from "../controllers/orderController.js";
-import { authenticate } from "../middleware/auth.js";
-import { handleValidation } from "../middleware/validate.js";
+import { createOrder, getOrders, patchOrderStatus } from "../controllers/orderController.js";
+import { authenticate, authorize } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post(
-  "/",
-  authenticate,
-  [
-    body("status").optional().isIn(["pending", "completed", "cancelled"]),
-    body("items").isArray({ min: 1 }).withMessage("Order items are required"),
-    body("items.*.product_id").isInt({ min: 1 }).withMessage("Valid product id is required"),
-    body("items.*.quantity").isInt({ min: 1 }).withMessage("Quantity must be at least 1"),
-    body("items.*.price").optional().isFloat({ min: 0 }),
-    handleValidation,
-  ],
-  createOrder
-);
+router.post("/", authenticate, createOrder);
 router.get("/", authenticate, getOrders);
+
+// Re-implemented to ensure no hidden character or route issues
+router.put("/:id", authenticate, authorize("admin"), patchOrderStatus);
+router.patch("/:id", authenticate, authorize("admin"), patchOrderStatus);
 
 export default router;

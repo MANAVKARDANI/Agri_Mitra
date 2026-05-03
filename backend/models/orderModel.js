@@ -1,12 +1,6 @@
 import pool from "../config/db.js";
 
-const createOrderError = (message, statusCode) => {
-  const error = new Error(message);
-  error.statusCode = statusCode;
-  return error;
-};
-
-export const createOrderWithItems = async ({ userId, status, items, address }) => {
+export const createOrderWithItems = async ({ userId, status, items }) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -17,7 +11,7 @@ export const createOrderWithItems = async ({ userId, status, items, address }) =
       const productId = Number(item.product_id);
       const qty = Number(item.quantity);
       if (!Number.isFinite(productId) || !Number.isFinite(qty) || qty <= 0) {
-        throw createOrderError("Invalid order item", 400);
+        throw new Error("Invalid order item");
       }
 
       const productRes = await client.query(
@@ -25,27 +19,22 @@ export const createOrderWithItems = async ({ userId, status, items, address }) =
         [productId]
       );
       const product = productRes.rows[0];
-      if (!product) throw createOrderError(`Product not found: ${productId}`, 404);
-      if (Number(product.stock) < qty) {
-        throw createOrderError(`Insufficient stock for product ${productId}`, 400);
-      }
+      if (!product) throw new Error(`Product not found: ${productId}`);
+      if (Number(product.stock) < qty) throw new Error(`Insufficient stock for product ${productId}`);
 
-      const unitPrice = Number(product.price);
-      if (!Number.isFinite(unitPrice)) {
-        throw createOrderError(`Invalid price for product ${productId}`, 500);
-      }
+      const unitPrice = Number(item.price ?? product.price);
+      if (!Number.isFinite(unitPrice)) throw new Error(`Invalid price for product ${productId}`);
       priceByProductId.set(productId, unitPrice);
       totalAmount += unitPrice * qty;
     }
 
-    const { house_no, street, city, pincode } = address || {};
     const orderResult = await client.query(
       `
-      INSERT INTO orders (user_id, total_amount, status, house_no, street, city, pincode)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO orders (user_id, total_amount, status)
+      VALUES ($1, $2, $3)
       RETURNING *
       `,
-      [userId, totalAmount, status || "pending", house_no || null, street || null, city || null, pincode || null]
+      [userId, totalAmount, status || "pending"]
     );
     const order = orderResult.rows[0];
 
@@ -53,9 +42,7 @@ export const createOrderWithItems = async ({ userId, status, items, address }) =
       const productId = Number(item.product_id);
       const qty = Number(item.quantity);
       const unitPrice = Number(priceByProductId.get(productId));
-      if (!Number.isFinite(unitPrice)) {
-        throw createOrderError(`Invalid derived price for product ${productId}`, 500);
-      }
+      if (!Number.isFinite(unitPrice)) throw new Error(`Invalid derived price for product ${productId}`);
 
       await client.query(
         `
@@ -121,4 +108,21 @@ export const listOrders = async ({ user }) => {
   );
 
   return rows;
+};
+
+export const updateOrderStatusById = async (id, status) => {
+  const allowed = ["pending", "completed", "cancelled"];
+  if (!allowed.includes(status)) {
+    throw new Error("Invalid order status");
+  }
+  const { rows } = await pool.query(
+    `
+    UPDATE orders
+    SET status = $1
+    WHERE id = $2
+    RETURNING id, user_id, total_amount, status, created_at
+    `,
+    [status, id]
+  );
+  return rows[0];
 };

@@ -3,22 +3,31 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ordersApi } from "../services/api";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
+import { useAuth } from "../context/AuthContext";
+import { paymentApi } from "../services/api";
 
 export default function Billing() {
   const [payment, setPayment] = useState("UPI");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [houseNo, setHouseNo] = useState("");
-  const [street, setStreet] = useState("");
-  const [city, setCity] = useState("");
-  const [pincode, setPincode] = useState("");
+  const [address, setAddress] = useState("");
   const { state } = useLocation();
   const navigate = useNavigate();
   const { items, clear } = useCart();
   const { showSuccess, showError } = useToast();
+  const { user } = useAuth();
 
-  const selectedItems = Array.isArray(state?.items) ? state.items : [];
-  const cartItems = selectedItems.length ? selectedItems : items;
+  const single = state
+    ? [
+        {
+          name: state.name,
+          product_id: state.product_id,
+          price: state.price,
+          quantity: state.quantity,
+        },
+      ]
+    : [];
+  const cartItems = items?.length ? items : single;
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + Number(item.price) * Number(item.quantity),
@@ -27,35 +36,91 @@ export default function Billing() {
   const tax = subtotal * 0.05;
   const total = subtotal + tax;
 
+  const handleFinalizeOrder = async () => {
+    try {
+      const itemsPayload = cartItems.map((item) => ({
+        product_id: Number(item.product_id),
+        quantity: Number(item.quantity),
+        price: Number(item.price),
+      }));
+
+      await ordersApi.create({
+        status: "pending",
+        items: itemsPayload,
+      });
+
+      clear();
+      showSuccess("Order placed successfully.");
+      navigate("/profile");
+    } catch (err) {
+      showError(err?.response?.data?.message || "Failed to place order");
+    }
+  };
+
+  const handleRazorpayPayment = async () => {
+    try {
+      // 1. Create order on backend
+      const { data: order } = await paymentApi.createOrder(total);
+
+      // 2. Open Razorpay modal
+      const options = {
+        key: "rzp_test_SaWN0V0vXd7f3q",
+        amount: order.amount,
+        currency: order.currency,
+        name: "Agri Mitra",
+        description: "Payment for your harvest products",
+        order_id: order.id,
+        handler: async (response) => {
+          try {
+            // 3. Verify payment on backend
+            const verifyRes = await paymentApi.verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            if (verifyRes.data.success) {
+              await handleFinalizeOrder();
+            } else {
+              showError("Payment verification failed");
+            }
+          } catch (err) {
+            showError("Payment verification error");
+          }
+        },
+        prefill: {
+          name: fullName || user?.name,
+          email: user?.email,
+          contact: phone,
+        },
+        theme: {
+          color: "#15803d",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      showError("Failed to initialize payment");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!cartItems.length) {
       showError("Your cart is empty.");
       return;
     }
-    if (!fullName.trim() || !phone.trim() || !street.trim() || !city.trim() || !pincode.trim()) {
-      showError("Please fill all billing details.");
+    if (!fullName.trim() || !phone.trim() || !address.trim()) {
+      showError("Please fill billing details.");
       return;
     }
-    try {
-      await ordersApi.create({
-        status: "pending",
-        items: cartItems.map((item) => ({
-          product_id: Number(item.product_id),
-          quantity: Number(item.quantity),
-        })),
-        address: {
-          house_no: houseNo.trim(),
-          street: street.trim(),
-          city: city.trim(),
-          pincode: pincode.trim(),
-        },
-      });
-      await clear(cartItems.map((item) => Number(item.product_id)));
-      showSuccess("Order placed successfully.");
-      navigate("/profile");
-    } catch (error) {
-      showError(error?.response?.data?.message || "Failed to place order");
+
+    if (payment === "UPI" || payment === "Card") {
+      await handleRazorpayPayment();
+    } else {
+      // Cash on delivery
+      await handleFinalizeOrder();
     }
   };
 
@@ -97,55 +162,20 @@ export default function Billing() {
                 </div>
               </div>
 
-              {/* ADDRESS FIELDS */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="text-sm text-gray-500">House No</label>
-                  <input
-                    required
-                    type="text"
-                    value={houseNo}
-                    onChange={(e) => setHouseNo(e.target.value)}
-                    placeholder="123"
-                    className="mt-2 w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-700 outline-none"
-                  />
-                </div>
+              {/* ADDRESS */}
+              <div>
+                <label className="text-sm text-gray-500">
+                  Shipping Address
+                </label>
 
-                <div>
-                  <label className="text-sm text-gray-500">Street</label>
-                  <input
-                    required
-                    type="text"
-                    value={street}
-                    onChange={(e) => setStreet(e.target.value)}
-                    placeholder="Main Street"
-                    className="mt-2 w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-700 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm text-gray-500">City</label>
-                  <input
-                    required
-                    type="text"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="Rajkot"
-                    className="mt-2 w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-700 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm text-gray-500">Pincode</label>
-                  <input
-                    required
-                    type="text"
-                    value={pincode}
-                    onChange={(e) => setPincode(e.target.value)}
-                    placeholder="360005"
-                    className="mt-2 w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-700 outline-none"
-                  />
-                </div>
+                <textarea
+                  required
+                  rows="3"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Street address, City, State, ZIP"
+                  className="mt-2 w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-700 outline-none"
+                />
               </div>
 
               {/* PAYMENT METHOD */}

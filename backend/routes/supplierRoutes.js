@@ -20,22 +20,18 @@ router.post(
     body("name").trim().notEmpty(),
     body("contact").trim().notEmpty(),
     body("address").trim().notEmpty(),
+    body("image").optional().isString(),
+    body("area_type").optional().isIn(["city", "town", "village"]),
+    body("state").optional().isString(),
+    body("district").optional().isString(),
+    body("city").optional().isString(),
+    body("village").optional().isString(),
+    body("business_hours").optional().isString(),
     handleValidation,
   ],
   addSupplier
 );
-router.put(
-  "/:id",
-  authenticate,
-  authorize("admin"),
-  [
-    body("name").optional().trim().notEmpty(),
-    body("contact").optional().trim().notEmpty(),
-    body("address").optional().trim().notEmpty(),
-    handleValidation,
-  ],
-  editSupplier
-);
+router.put("/:id", authenticate, authorize("admin"), editSupplier);
 router.delete("/:id", authenticate, authorize("admin"), removeSupplier);
 
 export default router;

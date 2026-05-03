@@ -18,9 +18,7 @@ import UserProfile from "./User/ProfilePage"; // ✅ FIX
 import EditProfile from "./User/EditProfile";
 import ProductDetails from "./User/ProductDetails";
 import Billing from "./User/Billing";
-import CartPage from "./User/CartPage";
-import InfoPage from "./pages/InfoPage";
-import NotFoundPage from "./pages/NotFoundPage";
+import Cart from "./User/Cart";
 
 /* Admin Layout */
 import AdminLayout from "./Admin/layout/Layout";
@@ -38,77 +36,6 @@ import AddUser from "./Admin/pages/AddUser";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-  const infoPages = {
-    privacy: {
-      title: "Privacy Policy",
-      description:
-        "Agri-Mitra stores only the information required to operate your account, manage orders, and support secure platform access.",
-      sections: [
-        {
-          heading: "Data We Collect",
-          body:
-            "We collect profile details, authentication data, and order activity needed to deliver platform features and customer support.",
-        },
-        {
-          heading: "How We Use It",
-          body:
-            "We use your data to authenticate users, manage stock orders, and improve the reliability of our agricultural supply workflows.",
-        },
-      ],
-    },
-    terms: {
-      title: "Terms of Service",
-      description:
-        "These terms describe how Agri-Mitra users access marketplace features, manage inventory, and place fertilizer orders responsibly.",
-      sections: [
-        {
-          heading: "Platform Usage",
-          body:
-            "Users must provide accurate account information and may only access features that match their assigned platform role.",
-        },
-        {
-          heading: "Order Handling",
-          body:
-            "Prices, stock availability, and order status are managed by the platform and may be updated when fulfillment conditions change.",
-        },
-      ],
-    },
-    cookies: {
-      title: "Cookies",
-      description:
-        "Agri-Mitra uses local browser storage to preserve authentication state, cart selections, and session continuity across visits.",
-      sections: [
-        {
-          heading: "Essential Storage",
-          body:
-            "We store the minimum browser data required to keep users logged in and retain cart contents between page refreshes.",
-        },
-        {
-          heading: "User Control",
-          body:
-            "Clearing browser storage will sign you out and remove locally stored cart information from your device.",
-        },
-      ],
-    },
-    sitemap: {
-      title: "Sitemap",
-      description:
-        "Use this page as a quick reference for the major routes available across the Agri-Mitra user and admin experiences.",
-      sections: [
-        {
-          heading: "User Routes",
-          body:
-            "Main user routes include Home, Shop, Shop Details, Product Details, Billing, Profile, Edit Profile, About, and Contact.",
-        },
-        {
-          heading: "Admin Routes",
-          body:
-            "Administrative routes include Dashboard, Suppliers, Inventory, Orders, Users, Add Shop, Add Fertilizer, and Add User.",
-        },
-      ],
-    },
-  };
-
   return (
     <BrowserRouter>
       <Routes>
@@ -129,15 +56,8 @@ function App() {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/edit-profile" element={<EditProfile />} />
             <Route path="/product-details" element={<ProductDetails />} />
-            <Route path="/cart" element={<CartPage />} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="/billing" element={<Billing />} />
-            <Route
-              path="/privacy"
-              element={<InfoPage {...infoPages.privacy} />}
-            />
-            <Route path="/terms" element={<InfoPage {...infoPages.terms} />} />
-            <Route path="/cookies" element={<InfoPage {...infoPages.cookies} />} />
-            <Route path="/sitemap" element={<InfoPage {...infoPages.sitemap} />} />
           </Route>
         </Route>
 
@@ -155,8 +75,6 @@ function App() {
             <Route path="add-user" element={<AddUser />} />
           </Route>
         </Route>
-
-        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

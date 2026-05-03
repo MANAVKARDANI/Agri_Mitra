@@ -2,26 +2,38 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
+import { resolveMediaUrl } from "../utils/assetUrl";
+
+const FALLBACK = {
+  id: 0,
+  name: "Potash",
+  price: 499,
+  stock: 23,
+  description:
+    "Our professional-grade fertilizer improves crop quality, strengthens roots, and boosts plant immunity.",
+  image:
+    "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&auto=format&fit=crop",
+};
 
 export default function ProductDetails() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { addItem } = useCart();
-  const { showError, showSuccess } = useToast();
+  const { showSuccess, showError } = useToast();
 
   const [quantity, setQuantity] = useState(1);
 
-  const product = state?.product || {
-    id: 0,
-    name: "Potash",
-    price: 499,
-    stock: 23,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuC7Jm8GLbEwAHCTT_8QFWbEb-9R6T5YkKeffvSOw14l39IkP7IZZuvfcph_2ist3WMYtZ9-IvgF2A3XjpDKyP1GraRFvOd5eP_wtBNU3gJu1B18qUR4kNQ-ZMIlkGK09oLTTUwp2DgjFgsJO6cSC9Raw1o_qXbAff4YXonKVLIRRxeZZtu5vrKYRENB4NJirbI66WOVgm9Iinpdp4-y1FX8s1Vk_BR03Q-vIfY1KmMEWGetJIkANMqfVEJ9TYqQ8fveWlDBy09zBYF8",
-  };
+  const raw = state?.product;
+  const product = raw
+    ? {
+        ...raw,
+        image: resolveMediaUrl(raw.image) || FALLBACK.image,
+        description: raw.description || FALLBACK.description,
+      }
+    : FALLBACK;
 
   const increase = () => {
-    if (quantity < product.stock) {
+    if (quantity < Number(product.stock)) {
       setQuantity(quantity + 1);
     }
   };
@@ -32,35 +44,38 @@ export default function ProductDetails() {
     }
   };
 
-  const handleAddToCart = async () => {
+  const linePayload = () => ({
+    name: product.name,
+    product_id: product.id,
+    price: product.price,
+    quantity,
+    image: product.image,
+    stock: product.stock,
+  });
+
+  const handleAddToCart = () => {
     if (!product.id) {
-      showError("This product cannot be added to cart.");
+      showError("Open a product from the shop to add it to your cart.");
       return;
     }
-    try {
-      await addItem({
-        product_id: product.id,
-        quantity,
-      });
-      showSuccess(`${product.name} added to cart.`);
-    } catch (error) {
-      showError(error?.response?.data?.message || "Failed to add item to cart.");
-    }
+    addItem(linePayload());
+    showSuccess("Added to cart.");
+    navigate("/cart");
   };
 
-  const handleBooking = () => {
+  const handleBuyNow = () => {
+    if (!product.id) {
+      showError("Open a product from the shop to buy.");
+      return;
+    }
+    addItem(linePayload());
     navigate("/billing", {
       state: {
-        items: [
-          {
-            name: product.name,
-            product_id: product.id,
-            price: product.price,
-            quantity,
-            image: product.image,
-            stock: product.stock,
-          },
-        ],
+        name: product.name,
+        product_id: product.id,
+        price: product.price,
+        quantity,
+        image: product.image,
       },
     });
   };
@@ -70,44 +85,33 @@ export default function ProductDetails() {
       <main className="py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row gap-16">
-            {/* PRODUCT IMAGE */}
             <div className="w-full md:w-1/2">
               <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-lg group">
                 <img
                   src={product.image}
-                  alt="Potash Fertilizer"
-                  className="w-full object-contain transition duration-500 group-hover:scale-105"
+                  alt={product.name}
+                  className="w-full object-contain max-h-[420px] transition duration-500 group-hover:scale-105"
                 />
               </div>
             </div>
 
-            {/* PRODUCT DETAILS */}
             <div className="w-full md:w-1/2 flex flex-col justify-center">
               <h1 className="text-5xl font-bold mb-4">{product.name}</h1>
 
-              <p className="text-2xl font-semibold text-gray-700 mb-6">
-                ₹{product.price}.00
-              </p>
+              <p className="text-2xl font-semibold text-gray-700 mb-6">₹{Number(product.price).toFixed(2)}</p>
 
-              <p className="text-gray-500 leading-relaxed mb-10 text-sm">
-                Our professional-grade Potash fertilizer improves crop quality,
-                strengthens roots, and boosts plant immunity. Perfect for
-                farmers looking for better yield and soil health.
-              </p>
+              <p className="text-gray-500 leading-relaxed mb-10 text-sm">{product.description}</p>
 
-              {/* STOCK */}
               <div className="flex items-center mb-8">
-                <span className="text-sm font-medium uppercase text-gray-500 mr-3">
-                  Stock
-                </span>
+                <span className="text-sm font-medium uppercase text-gray-500 mr-3">Stock</span>
 
                 <span className="font-bold text-lg">{product.stock}</span>
               </div>
 
-              {/* QUANTITY */}
               <div className="flex items-center gap-6 mb-10">
                 <div className="flex border border-gray-200 rounded-lg">
                   <button
+                    type="button"
                     onClick={decrease}
                     className="px-4 py-2 text-lg hover:text-green-700"
                   >
@@ -117,6 +121,7 @@ export default function ProductDetails() {
                   <span className="px-6 py-2 font-bold">{quantity}</span>
 
                   <button
+                    type="button"
                     onClick={increase}
                     className="px-4 py-2 text-lg hover:text-green-700"
                   >
@@ -125,35 +130,32 @@ export default function ProductDetails() {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 <button
+                  type="button"
                   onClick={handleAddToCart}
-                  className="w-full md:w-auto px-10 py-4 bg-green-800 text-white font-bold rounded-xl hover:bg-green-900 transition uppercase tracking-widest text-sm"
+                  className="px-10 py-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded-xl transition uppercase tracking-widest text-sm shadow-md"
                 >
-                  Add to Cart
+                  Add to cart
                 </button>
-
                 <button
-                  onClick={handleBooking}
-                  className="w-full md:w-auto px-10 py-4 border-2 border-green-800 text-green-800 font-bold rounded-xl hover:bg-green-800 hover:text-white transition uppercase tracking-widest text-sm"
+                  type="button"
+                  onClick={handleBuyNow}
+                  className="px-10 py-4 border-2 border-green-800 text-green-800 font-bold rounded-xl hover:bg-green-800 hover:text-white transition uppercase tracking-widest text-sm"
                 >
-                  Buy Now
+                  Buy now
                 </button>
               </div>
             </div>
           </div>
 
-          {/* INFORMATION SECTION */}
           <div className="mt-28 border-t pt-16">
             <div className="bg-[#F9F9F7] rounded-3xl p-14">
-              <h2 className="text-4xl font-bold text-center mb-6">
-                AGRI-MITRA. We're here.
-              </h2>
+              <h2 className="text-4xl font-bold text-center mb-6">AGRI-MITRA. We&apos;re here.</h2>
 
               <p className="text-center text-gray-500 max-w-xl mx-auto mb-12 text-sm">
-                Hello, we are AGRI-MITRA. Always beside you when you buy farm
-                products or sell. The best results for your harvest are just in
-                sight.
+                Hello, we are AGRI-MITRA. Always beside you when you buy farm products or sell. The best
+                results for your harvest are just in sight.
               </p>
 
               <div className="grid md:grid-cols-2 gap-10">
@@ -177,7 +179,9 @@ export default function ProductDetails() {
                       className="w-full bg-transparent outline-none text-sm"
                     />
 
-                    <button className="text-green-700 font-semibold">→</button>
+                    <button type="button" className="text-green-700 font-semibold">
+                      →
+                    </button>
                   </div>
                 </div>
               </div>
