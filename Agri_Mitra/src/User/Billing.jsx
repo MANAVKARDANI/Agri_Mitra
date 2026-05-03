@@ -16,6 +16,7 @@ export default function Billing() {
   const { items, clear } = useCart();
   const { showSuccess, showError } = useToast();
   const { user } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const single = state
     ? [
@@ -58,6 +59,12 @@ export default function Billing() {
   };
 
   const handleRazorpayPayment = async () => {
+    if (!window.Razorpay) {
+      showError("Razorpay SDK failed to load. Please check your connection.");
+      return;
+    }
+    
+    setIsProcessing(true);
     try {
       // 1. Create order on backend
       const { data: order } = await paymentApi.createOrder(total);
@@ -99,9 +106,16 @@ export default function Billing() {
       };
 
       const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", (response) => {
+        showError(response.error.description || "Payment failed");
+        setIsProcessing(false);
+      });
       rzp.open();
     } catch (err) {
-      showError("Failed to initialize payment");
+      console.error("Razorpay Error:", err);
+      showError(err?.response?.data?.message || "Failed to initialize payment");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -255,9 +269,19 @@ export default function Billing() {
 
             <button
               onClick={handleSubmit}
-              className="w-full mt-8 bg-[#111827] text-white py-4 rounded-xl font-semibold hover:bg-black transition"
+              disabled={isProcessing}
+              className={`w-full mt-8 text-white py-4 rounded-xl font-semibold transition flex items-center justify-center gap-2 ${
+                isProcessing ? "bg-gray-400 cursor-not-allowed" : "bg-[#111827] hover:bg-black"
+              }`}
             >
-              Confirm & Pay →
+              {isProcessing ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                "Confirm & Pay →"
+              )}
             </button>
 
             <p className="text-xs text-gray-400 text-center mt-4">
