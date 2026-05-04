@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./Login";
 import Register from "./Register";
 import ForgotPassword from "./ForgotPassword";
+import ResetPassword from "./ResetPassword";
 
 /* User Layout */
 import MainLayout from "./layout/MainLayout";
@@ -13,7 +14,7 @@ import Home from "./User/Home";
 import Shop from "./User/Shop";
 import ShopDetails from "./User/ShopDetails";
 import About from "./User/About";
-import Contact from "./User/contact";
+import Contact from "./User/Contact";
 import UserProfile from "./User/ProfilePage"; // ✅ FIX
 import EditProfile from "./User/EditProfile";
 import ProductDetails from "./User/ProductDetails";
@@ -44,6 +45,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         {/* USER */}
         <Route element={<ProtectedRoute roles={["user", "admin"]} />}>

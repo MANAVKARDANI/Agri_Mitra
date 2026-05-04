@@ -48,6 +48,23 @@ export const addSupplier = async (req, res) => {
 
 export const editSupplier = async (req, res) => {
   try {
+    const allowedFields = [
+      "name",
+      "contact",
+      "address",
+      "image",
+      "area_type",
+      "state",
+      "district",
+      "city",
+      "village",
+      "business_hours",
+    ];
+    const hasUpdateField = allowedFields.some((field) => req.body[field] !== undefined);
+    if (!hasUpdateField) {
+      return res.status(400).json({ message: "Nothing to update" });
+    }
+
     const supplier = await updateSupplierById(Number(req.params.id), req.body);
     if (!supplier) return res.status(404).json({ message: "Supplier not found" });
     return res.json(supplier);

@@ -107,16 +107,8 @@ export default function Shops() {
         </div>
 
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 border px-3 py-2 rounded-lg text-sm hover:bg-gray-100">
-            <Filter size={16} />
-            Filter
-          </button>
-
-          <button className="flex items-center gap-2 border px-3 py-2 rounded-lg text-sm hover:bg-gray-100">
-            <Download size={16} />
-            Export
-          </button>
         </div>
+
       </div>
 
       {/* ================= TABLE ================= */}

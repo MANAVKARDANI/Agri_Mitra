@@ -48,12 +48,15 @@ export default function Home() {
             </p>
 
             <div className="mt-8 flex gap-4">
-              <button
-                type="button"
-                className="bg-green-800 hover:bg-green-900 text-white px-6 py-3 rounded-lg font-semibold transition hover:scale-105"
-              >
-                Explore Products
-              </button>
+              <Link to="/shop">
+                <button
+                  type="button"
+                  className="bg-green-800 hover:bg-green-900 text-white px-6 py-3 rounded-lg font-semibold transition hover:scale-105"
+                >
+                  Explore Products
+                </button>
+              </Link>
+
 
               <button
                 type="button"
@@ -249,12 +252,14 @@ export default function Home() {
             />
           </div>
 
-          <button
-            type="button"
-            className="mt-16 border border-gray-300 px-8 py-3 rounded-full text-sm font-semibold text-gray-700 hover:bg-gray-100 transition hover:scale-105"
-          >
-            VIEW ALL PRODUCTS
-          </button>
+          <Link to="/shop">
+            <button
+              type="button"
+              className="mt-16 border border-gray-300 px-8 py-3 rounded-full text-sm font-semibold text-gray-700 hover:bg-gray-100 transition hover:scale-105"
+            >
+              VIEW ALL PRODUCTS
+            </button>
+          </Link>
         </div>
       </section>
     </div>

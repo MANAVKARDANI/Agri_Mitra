@@ -90,15 +90,9 @@ export default function OrdersApi() {
               />
             </svg>
           </div>
-          <button
-            type="button"
-            className="flex items-center gap-2 border px-4 py-2 rounded-lg text-sm hover:bg-gray-100"
-          >
-            <Download size={16} />
-            Export CSV
-          </button>
         </div>
       </div>
+
       <div className="bg-white border rounded-xl overflow-hidden shadow-sm">
         <table className="w-full text-sm">
           <thead className="bg-green-50 text-green-700 text-xs uppercase">
@@ -109,6 +103,7 @@ export default function OrdersApi() {
               <th className="text-left">Order</th>
               <th className="text-left">Items</th>
               <th className="text-left">Total</th>
+              <th className="text-left">Payment</th>
               <th className="text-left">Status</th>
             </tr>
           </thead>
@@ -161,15 +156,32 @@ export default function OrdersApi() {
                       ₹{Number(order.total_amount).toFixed(2)}
                     </td>
                     <td className="p-4">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs font-bold text-gray-700">
+                          {order.payment_method || "Cash"}
+                        </span>
+                        <span
+                          className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full w-fit ${
+                            order.payment_status === "Paid"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
+                          {order.payment_status || "Pending"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-4">
                       <select
                         value={order.status || "pending"}
                         onChange={async (e) => {
                           const v = e.target.value;
                           try {
-                            await ordersApi.updateStatus(order.id, v);
+                            const { data: updatedOrder } = await ordersApi.updateStatus(order.id, v);
                             setOrders((prev) =>
-                              prev.map((o) => (o.id === order.id ? { ...o, status: v } : o))
+                              prev.map((o) => (o.id === order.id ? updatedOrder : o))
                             );
+
                             showSuccess("Order status updated.");
                           } catch (err) {
                             showError(err?.response?.data?.message || "Failed to update status");

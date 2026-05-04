@@ -47,16 +47,8 @@ export default function Orders() {
         </div>
 
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 border px-4 py-2 rounded-lg text-sm hover:bg-gray-100">
-            <Download size={16} />
-            Export CSV
-          </button>
-
-          <button className="flex items-center gap-2 border px-4 py-2 rounded-lg text-sm hover:bg-gray-100">
-            <Filter size={16} />
-            Filter
-          </button>
         </div>
+
       </div>
 
       {/* ================= TABLE ================= */}

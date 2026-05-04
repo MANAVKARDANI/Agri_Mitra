@@ -37,7 +37,7 @@ export default function Billing() {
   const tax = subtotal * 0.05;
   const total = subtotal + tax;
 
-  const handleFinalizeOrder = async () => {
+  const handleFinalizeOrder = async (paymentStatus = "Pending", paymentMethod = "Cash") => {
     try {
       const itemsPayload = cartItems.map((item) => ({
         product_id: Number(item.product_id),
@@ -48,6 +48,8 @@ export default function Billing() {
       await ordersApi.create({
         status: "pending",
         items: itemsPayload,
+        payment_method: paymentMethod,
+        payment_status: paymentStatus,
       });
 
       clear();
@@ -87,14 +89,15 @@ export default function Billing() {
             });
 
             if (verifyRes.data.success) {
-              await handleFinalizeOrder();
+              await handleFinalizeOrder("Paid", payment);
             } else {
               showError("Payment verification failed");
             }
-          } catch (err) {
+          } catch {
             showError("Payment verification error");
           }
         },
+
         prefill: {
           name: fullName || user?.name,
           email: user?.email,
@@ -134,8 +137,9 @@ export default function Billing() {
       await handleRazorpayPayment();
     } else {
       // Cash on delivery
-      await handleFinalizeOrder();
+      await handleFinalizeOrder("Pending", "Cash");
     }
+
   };
 
   return (

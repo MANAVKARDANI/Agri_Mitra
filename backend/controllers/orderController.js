@@ -6,17 +6,26 @@ import {
 
 export const createOrder = async (req, res) => {
   try {
-    const { items, status } = req.body;
+    const { items, status, payment_method, payment_status } = req.body;
     const userId = req.user.id;
 
     if (!Array.isArray(items) || !items.length) {
       return res.status(400).json({ message: "Order items are required" });
     }
 
-    const order = await createOrderWithItems({ userId, status, items });
+    const order = await createOrderWithItems({
+      userId,
+      status,
+      items,
+      payment_method,
+      payment_status,
+    });
+
     return res.status(201).json(order);
   } catch (error) {
-    return res.status(500).json({ message: "Failed to create order", error: error.message });
+    return res
+      .status(error.statusCode || 500)
+      .json({ message: error.message || "Failed to create order" });
   }
 };
 

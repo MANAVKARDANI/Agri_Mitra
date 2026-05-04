@@ -73,15 +73,18 @@ export const deleteUserById = async (id) => {
 export const setPasswordResetToken = async ({
   userId,
   tokenHash,
-  expiresAt,
+  expiresAtMs,
 }) => {
   await pool.query(
     `
     UPDATE users
-    SET reset_token_hash = $1, reset_token_expires_at = $2
+    SET reset_token = $1,
+        reset_token_expiry = $2::BIGINT,
+        reset_token_hash = $1,
+        reset_token_expires_at = TO_TIMESTAMP($2::DOUBLE PRECISION / 1000.0)
     WHERE id = $3
     `,
-    [tokenHash, expiresAt, userId]
+    [tokenHash, expiresAtMs, userId]
   );
 };
 
@@ -89,11 +92,11 @@ export const findUserByResetTokenHash = async (tokenHash) => {
   const { rows } = await pool.query(
     `
     SELECT * FROM users
-    WHERE reset_token_hash = $1
-      AND reset_token_expires_at IS NOT NULL
-      AND reset_token_expires_at > NOW()
+    WHERE reset_token = $1
+      AND reset_token_expiry IS NOT NULL
+      AND reset_token_expiry > $2
     `,
-    [tokenHash]
+    [tokenHash, Date.now()]
   );
   return rows[0];
 };
@@ -103,6 +106,8 @@ export const updatePasswordAndClearReset = async ({ userId, hashedPassword }) =>
     `
     UPDATE users
     SET password = $1,
+        reset_token = NULL,
+        reset_token_expiry = NULL,
         reset_token_hash = NULL,
         reset_token_expires_at = NULL
     WHERE id = $2

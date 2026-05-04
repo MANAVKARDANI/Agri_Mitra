@@ -52,6 +52,12 @@ export const addProduct = async (req, res) => {
 export const editProduct = async (req, res) => {
   try {
     const payload = { ...req.body };
+    const allowedFields = ["name", "description", "price", "image", "stock", "supplier_id"];
+    const hasUpdateField = allowedFields.some((field) => payload[field] !== undefined);
+    if (!hasUpdateField) {
+      return res.status(400).json({ message: "Nothing to update" });
+    }
+
     if (payload.price !== undefined) payload.price = Number(payload.price);
     if (payload.stock !== undefined) payload.stock = Number(payload.stock);
     if (payload.supplier_id !== undefined) {

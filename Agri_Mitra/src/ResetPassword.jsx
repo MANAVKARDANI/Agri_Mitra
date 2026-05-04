@@ -1,31 +1,43 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import ForgotImage from "./assets/forgotpass.png";
 import { authApi } from "./services/api";
 import { useToast } from "./context/ToastContext";
 
-export default function ForgotPassword() {
+export default function ResetPassword() {
+  const { token = "" } = useParams();
   const { showSuccess, showError } = useToast();
-  const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  const canSubmit = useMemo(
+    () => token && newPassword.length >= 6 && newPassword === confirmPassword,
+    [token, newPassword, confirmPassword]
+  );
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!email.trim()) {
-      showError("Email is required.");
+    if (!canSubmit) {
+      const errorMessage = "Enter matching passwords with at least 6 characters.";
+      setMessage(errorMessage);
+      showError(errorMessage);
       return;
     }
 
     try {
       setLoading(true);
-      const { data } = await authApi.forgotPassword({ email: email.trim() });
-      const successMessage = data?.message || "If this email exists, a reset link has been sent.";
+      const { data } = await authApi.resetPassword(token, { newPassword });
+      const successMessage = data?.message || "Password reset successful.";
       setMessage(successMessage);
-      showSuccess("Reset link sent. Check your email.");
+      setNewPassword("");
+      setConfirmPassword("");
+      showSuccess("Password reset successful. You can log in now.");
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Failed to send reset link.";
+      const errorMessage =
+        error.response?.data?.message || "Reset link is invalid or expired.";
       setMessage(errorMessage);
       showError(errorMessage);
     } finally {
@@ -43,31 +55,47 @@ export default function ForgotPassword() {
               REAL-TIME STOCK ALERTS
             </p>
 
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Forgot Password?</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">Reset Password</h2>
             <p className="text-gray-500 text-sm mb-8">
-              Enter your email address and we will send a secure reset link.
+              Create a new password for your account.
             </p>
 
-            <label className="text-sm text-gray-600" htmlFor="email">
-              Email address
+            <label className="text-sm text-gray-600" htmlFor="newPassword">
+              New password
             </label>
             <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="name@example.com"
+              id="newPassword"
+              type="password"
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
+              placeholder="Enter new password"
               className="w-full mt-2 p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-700"
-              autoComplete="email"
+              autoComplete="new-password"
               required
+              minLength={6}
+            />
+
+            <label className="text-sm text-gray-600 mt-4 block" htmlFor="confirmPassword">
+              Confirm password
+            </label>
+            <input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              placeholder="Confirm new password"
+              className="w-full mt-2 p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-700"
+              autoComplete="new-password"
+              required
+              minLength={6}
             />
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !canSubmit}
               className="w-full mt-6 bg-green-800 hover:bg-green-900 disabled:bg-gray-400 text-white py-3 rounded-full font-semibold transition"
             >
-              {loading ? "Sending..." : "Send Reset Link"}
+              {loading ? "Updating..." : "Reset Password"}
             </button>
 
             {message ? <p className="text-sm text-gray-600 mt-4">{message}</p> : null}

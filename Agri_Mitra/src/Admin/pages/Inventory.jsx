@@ -238,15 +238,6 @@ export default function Fertilizers() {
         </div>
 
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 border px-3 py-2 rounded-lg text-sm">
-            <Filter size={16} />
-            Filter
-          </button>
-
-          <button className="flex items-center gap-2 border px-3 py-2 rounded-lg text-sm">
-            <Download size={16} />
-            Export
-          </button>
         </div>
       </div>
 
@@ -396,42 +387,7 @@ export default function Fertilizers() {
         </div>
       </div>
 
-      {/* BOTTOM CARDS */}
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-green-50 border rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <Wand2 className="text-green-700" />
-
-            <h3 className="font-semibold">Smart Inventory Optimization</h3>
-          </div>
-
-          <p className="text-sm text-gray-600 mb-4">
-            Let our AI analyze your soil reports to suggest the optimal
-            fertilizer restocking levels.
-          </p>
-
-          <button className="text-green-700 text-sm font-medium">
-            Run Analysis →
-          </button>
-        </div>
-
-        <div className="bg-white border rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <Printer className="text-green-700" />
-
-            <h3 className="font-semibold">Batch Print Labels</h3>
-          </div>
-
-          <p className="text-sm text-gray-600 mb-4">
-            Generate QR labels for warehouse tracking system.
-          </p>
-
-          <button className="border px-4 py-2 rounded-lg text-sm">
-            Generate Labels
-          </button>
-        </div>
-      </div>
 
       {editing && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40">

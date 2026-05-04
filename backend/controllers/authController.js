@@ -17,8 +17,7 @@ const signToken = (user) =>
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role = "user" } = req.body;
-    const normalizedRole = role.toLowerCase() === "admin" ? "admin" : "user";
+    const { name, email, password } = req.body;
 
     const exists = await findUserByEmail(email);
     if (exists) {
@@ -30,7 +29,7 @@ export const register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: normalizedRole,
+      role: "user",
     });
 
     const token = signToken(user);
@@ -91,16 +90,16 @@ export const forgotPassword = async (req, res) => {
 
     const rawToken = crypto.randomBytes(32).toString("hex");
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
-    const expiresAt = new Date(Date.now() + 1000 * 60 * 15); // 15 min
+    const expiresAtMs = Date.now() + 1000 * 60 * 60;
 
     await setPasswordResetToken({
       userId: user.id,
       tokenHash,
-      expiresAt,
+      expiresAtMs,
     });
 
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5174";
-    const resetLink = `${frontendUrl}/forgot-password?token=${rawToken}`;
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const resetLink = `${frontendUrl}/reset-password/${rawToken}`;
 
     const transporter = await getTransporter();
     const from = process.env.MAIL_FROM || "no-reply@agrimitra.local";
@@ -112,15 +111,15 @@ export const forgotPassword = async (req, res) => {
       html: `
         <p>You requested a password reset for Agri Mitra.</p>
         <p><a href="${resetLink}">Click here to reset your password</a></p>
-        <p>This link expires in 15 minutes.</p>
+        <p>This link expires in 1 hour.</p>
       `,
     });
 
-    return res.json({
-      message: "If this email exists, a reset link has been sent.",
-      preview: info.message?.toString() || null,
-      resetLink,
-    });
+    const response = { message: "If this email exists, a reset link has been sent." };
+    if (process.env.NODE_ENV !== "production" && info.message) {
+      response.preview = info.message.toString();
+    }
+    return res.json(response);
   } catch (error) {
     return res.status(500).json({ message: "Failed to send reset email", error: error.message });
   }
@@ -128,7 +127,8 @@ export const forgotPassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   try {
-    const { token, newPassword } = req.body;
+    const token = req.params.token || req.body.token;
+    const { newPassword } = req.body;
     const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
     const user = await findUserByResetTokenHash(tokenHash);
     if (!user) {

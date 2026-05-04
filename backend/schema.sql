@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
   password TEXT NOT NULL,
   role VARCHAR(20) NOT NULL DEFAULT 'user' CHECK (role IN ('admin', 'user')),
   avatar TEXT DEFAULT '',
+  reset_token TEXT,
+  reset_token_expiry BIGINT,
   reset_token_hash TEXT,
   reset_token_expires_at TIMESTAMP,
   created_at TIMESTAMP NOT NULL DEFAULT NOW()
@@ -51,3 +53,14 @@ CREATE TABLE IF NOT EXISTS order_items (
   quantity INTEGER NOT NULL CHECK (quantity > 0),
   price NUMERIC(12, 2) NOT NULL CHECK (price >= 0)
 );
+
+CREATE TABLE IF NOT EXISTS cart_items (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  quantity INTEGER NOT NULL CHECK (quantity > 0),
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  UNIQUE (user_id, product_id)
+);
+

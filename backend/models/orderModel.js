@@ -1,6 +1,12 @@
 import pool from "../config/db.js";
 
-export const createOrderWithItems = async ({ userId, status, items }) => {
+export const createOrderWithItems = async ({
+  userId,
+  status,
+  items,
+  payment_method,
+  payment_status,
+}) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -19,23 +25,39 @@ export const createOrderWithItems = async ({ userId, status, items }) => {
         [productId]
       );
       const product = productRes.rows[0];
-      if (!product) throw new Error(`Product not found: ${productId}`);
-      if (Number(product.stock) < qty) throw new Error(`Insufficient stock for product ${productId}`);
+      if (!product) {
+        const error = new Error(`Product not found: ${productId}`);
+        error.statusCode = 404;
+        throw error;
+      }
+      if (Number(product.stock) < qty) {
+        const error = new Error(`Insufficient stock for product ${productId}`);
+        error.statusCode = 400;
+        throw error;
+      }
 
-      const unitPrice = Number(item.price ?? product.price);
-      if (!Number.isFinite(unitPrice)) throw new Error(`Invalid price for product ${productId}`);
+      const unitPrice = Number(product.price);
+      if (!Number.isFinite(unitPrice))
+        throw new Error(`Invalid price for product ${productId}`);
       priceByProductId.set(productId, unitPrice);
       totalAmount += unitPrice * qty;
     }
 
     const orderResult = await client.query(
       `
-      INSERT INTO orders (user_id, total_amount, status)
-      VALUES ($1, $2, $3)
+      INSERT INTO orders (user_id, total_amount, status, payment_method, payment_status)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *
       `,
-      [userId, totalAmount, status || "pending"]
+      [
+        userId,
+        totalAmount,
+        status || "pending",
+        payment_method || "Cash",
+        payment_status || "Pending",
+      ]
     );
+
     const order = orderResult.rows[0];
 
     for (const item of items) {
@@ -80,6 +102,8 @@ export const listOrders = async ({ user }) => {
       o.user_id,
       o.total_amount,
       o.status,
+      o.payment_method,
+      o.payment_status,
       o.created_at,
       u.name AS user_name,
       u.email AS user_email,
@@ -115,14 +139,24 @@ export const updateOrderStatusById = async (id, status) => {
   if (!allowed.includes(status)) {
     throw new Error("Invalid order status");
   }
-  const { rows } = await pool.query(
-    `
-    UPDATE orders
-    SET status = $1
-    WHERE id = $2
-    RETURNING id, user_id, total_amount, status, created_at
-    `,
-    [status, id]
-  );
+
+  // If status is "completed", we also set payment_status to "Paid"
+  const query =
+    status === "completed"
+      ? `
+      UPDATE orders
+      SET status = $1, payment_status = 'Paid'
+      WHERE id = $2
+      RETURNING id, user_id, total_amount, status, payment_method, payment_status, created_at
+      `
+      : `
+      UPDATE orders
+      SET status = $1
+      WHERE id = $2
+      RETURNING id, user_id, total_amount, status, payment_method, payment_status, created_at
+      `;
+
+  const { rows } = await pool.query(query, [status, id]);
   return rows[0];
 };
+

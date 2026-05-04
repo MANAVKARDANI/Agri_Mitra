@@ -124,7 +124,24 @@ export default function Profile() {
                     <span className="text-yellow-700">₹{Number(o.total_amount).toFixed(2)}</span>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">{formatDate(o.created_at)}</p>
-                  <p className="text-xs text-gray-600 mt-2 capitalize">Status: {o.status}</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs text-gray-600 capitalize">Status: {o.status}</p>
+                    <div className="flex gap-2">
+                      <span className="text-[10px] font-bold text-gray-500 uppercase">
+                        {o.payment_method || "Cash"}
+                      </span>
+                      <span
+                        className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                          o.payment_status === "Paid"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}
+                      >
+                        {o.payment_status || "Pending"}
+                      </span>
+                    </div>
+                  </div>
+
                   {Array.isArray(o.items) && o.items.length > 0 && (
                     <ul className="mt-2 text-xs text-gray-600 space-y-1">
                       {o.items.map((it) => (

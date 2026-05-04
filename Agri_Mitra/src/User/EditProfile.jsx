@@ -22,7 +22,6 @@ export default function EditProfile() {
 
   useEffect(() => {
     if (user) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync form when auth user loads/changes
       setName(user.name || "");
       setEmail(user.email || "");
       setAvatarUrl(user.avatar || "");

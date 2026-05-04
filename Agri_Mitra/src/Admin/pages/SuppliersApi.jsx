@@ -13,7 +13,7 @@ import {
   Leaf,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { suppliersApi } from "../../services/api";
 import { useToast } from "../../context/ToastContext";
@@ -200,22 +200,9 @@ export default function SuppliersApi() {
           />
         </div>
         <div className="flex gap-3">
-          <button
-            type="button"
-            className="flex items-center gap-2 border px-3 py-2 rounded-lg text-sm hover:bg-gray-100"
-          >
-            <Filter size={16} />
-            Filter
-          </button>
-          <button
-            type="button"
-            className="flex items-center gap-2 border px-3 py-2 rounded-lg text-sm hover:bg-gray-100"
-          >
-            <Download size={16} />
-            Export
-          </button>
         </div>
       </div>
+
 
       <div className="bg-white border rounded-xl overflow-hidden shadow-sm">
         <table className="w-full text-sm">
